@@ -1,0 +1,11 @@
+IDE+ – Atualização do planejamento editorial
+
+19/10: não houve publicação; não foi marcado como publicado.
+20/10: Reel “Pontos marcantes do DF” reagendado; stories com repost e rotina real.
+21/10: carrossel de motoristas mantido; stories com repost, enquete e caixinha.
+22/10 a 13/11: roteiros revisados, tela a tela.
+
+Atenção: data planejada não equivale a publicação efetiva. O status de publicação deve ser marcado manualmente.
+Os IDs existentes dos demais conteúdos foram preservados para manter os registros salvos.
+Se houver dados salvos na versão antiga, faça backup antes de substituir arquivos.
+Alterações em arquivos HTML publicados precisam ser reenviadas ao servidor de hospedagem.
