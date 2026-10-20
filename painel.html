@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel Ide+</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: cabeçalho escuro com logo e abas; abaixo, uma página por aba com cartões largos. Um único bloco de CSS, tokens no :root. */
+:root {
+  color-scheme: light;
+  --bg: #F6F3FA; --surface: #FFFFFF; --ink: #21192B; --muted: #6B6377; --line: #E5DEEE;
+  --primary: #2D1746; --on-primary: #FFFFFF; --accent: #C52B7C; --soft: #F3ECF8;
+  --hdr1: #20112F; --hdr2: #3A1F56;
+  --s0-bg: #EEE9F3; --s0-fg: #554C63;
+  --s1-bg: #FCEFD3; --s1-fg: #74500F;
+  --s2-bg: #E3EAFA; --s2-fg: #2E4D82;
+  --s3-bg: #DDF1E6; --s3-fg: #1F6446;
+  --s4-bg: #2D1746; --s4-fg: #FFFFFF;
+  --bad-bg: #FBE1E8; --bad-fg: #9A1B47;
+  --c-ig: #C52B7C; --c-fb: #2D1746; --c-tt: #0E8F8F;
+  --shadow: 0 4px 16px rgba(31, 19, 46, .05);
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-body: "Figtree", "Segoe UI", -apple-system, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #150C22; --surface: #211333; --ink: #F4EBFB; --muted: #B7A6CB; --line: #3A2653;
+    --primary: #C9A6F0; --on-primary: #1B0D2B; --accent: #FF7AB0; --soft: #2B1A44;
+    --hdr1: #1B0F2A; --hdr2: #2F1B48;
+    --s0-bg: #34264A; --s0-fg: #D8CBE8;
+    --s1-bg: #4A3510; --s1-fg: #FFD98A;
+    --s2-bg: #1E3358; --s2-fg: #B5D0FF;
+    --s3-bg: #17402A; --s3-fg: #A8E8BE;
+    --s4-bg: #C9A6F0; --s4-fg: #1B0D2B;
+    --bad-bg: #4C1730; --bad-fg: #FFB3CB;
+    --c-ig: #FF7AB0; --c-fb: #B58CE8; --c-tt: #4FD1C5;
+    --shadow: 0 4px 16px rgba(0, 0, 0, .25);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #150C22; --surface: #211333; --ink: #F4EBFB; --muted: #B7A6CB; --line: #3A2653;
+  --primary: #C9A6F0; --on-primary: #1B0D2B; --accent: #FF7AB0; --soft: #2B1A44;
+  --hdr1: #1B0F2A; --hdr2: #2F1B48;
+  --s0-bg: #34264A; --s0-fg: #D8CBE8;
+  --s1-bg: #4A3510; --s1-fg: #FFD98A;
+  --s2-bg: #1E3358; --s2-fg: #B5D0FF;
+  --s3-bg: #17402A; --s3-fg: #A8E8BE;
+  --s4-bg: #C9A6F0; --s4-fg: #1B0D2B;
+  --bad-bg: #4C1730; --bad-fg: #FFB3CB;
+  --c-ig: #FF7AB0; --c-fb: #B58CE8; --c-tt: #4FD1C5;
+  --shadow: 0 4px 16px rgba(0, 0, 0, .25);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-padding-top: 12px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-block: 28px 70px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; letter-spacing: -0.02em; }
+h2 { font-size: 21px; color: var(--primary); }
+h3 { font-size: 17px; }
+h4 { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+p { margin: 0; }
+button, select, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.tnum, td, .kpi b, .d { font-variant-numeric: tabular-nums; }
+.col { display: flex; flex-direction: column; gap: 16px; }
+.none { color: var(--muted); font-size: 14px; }
+
+/* Cabeçalho: escuro nos dois temas, por isso usa cores fixas */
+.top { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px;
+  background: linear-gradient(135deg, var(--hdr1) 0%, #2C1841 58%, var(--hdr2) 100%); box-shadow: 0 18px 40px rgba(32, 20, 45, .16); position: relative; overflow: hidden; }
+.top::after { content: ""; position: absolute; right: -50px; bottom: -60px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(255,255,255,.07) 0%, rgba(255,255,255,0) 72%); pointer-events: none; }
+.brand { display: flex; align-items: center; gap: 18px; min-width: 0; position: relative; z-index: 1; }
+.logo-badge { background: #fff; border-radius: 18px; padding: 12px 18px; display: flex; flex: none; box-shadow: 0 10px 26px rgba(0,0,0,.14); }
+.ide-official-logo { display: block; height: 52px; width: auto; max-width: 190px; object-fit: contain; }
+.brand h1 { color: #fff; font-size: 24px; margin-bottom: 4px; }
+.brand p { color: #D7CDDF; font-size: 13.5px; max-width: 560px; }
+.tabs { display: flex; gap: 3px; padding: 4px; border-radius: 13px; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.08); position: relative; z-index: 1; max-width: 100%; overflow-x: auto; }
+.tab { border: 0; background: transparent; color: #E3D9EA; padding: 9px 13px; border-radius: 9px; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.tab:hover { background: rgba(255,255,255,.13); }
+.tab[aria-selected="true"] { background: #fff; color: #281738; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+.tab .badge { margin-left: 6px; background: #F5A3C7; color: #4B0F2A; border-radius: 999px; padding: 0 7px; font-size: 12px; }
+.notice { background: var(--s1-bg); color: var(--s1-fg); padding: 11px 16px; border-radius: 12px; font-size: 14px; }
+.notice.bad { background: var(--bad-bg); color: var(--bad-fg); }
+
+/* Peças comuns */
+.panel { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 14px; font-weight: 600; font-size: 13.5px; }
+.btn:hover { background: var(--soft); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.btn:disabled { opacity: .5; cursor: default; }
+a.btn { text-decoration: none; display: inline-block; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 15px; font-size: 14px; font-weight: 500; }
+.chip[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pill { font-size: 12.5px; font-weight: 600; padding: 2px 10px; border-radius: 999px; white-space: nowrap; display: inline-block; }
+.pill[data-s="0"] { background: var(--s0-bg); color: var(--s0-fg); }
+.pill[data-s="1"] { background: var(--s1-bg); color: var(--s1-fg); }
+.pill[data-s="2"] { background: var(--s2-bg); color: var(--s2-fg); }
+.pill[data-s="3"] { background: var(--s3-bg); color: var(--s3-fg); }
+.pill[data-s="4"] { background: var(--s4-bg); color: var(--s4-fg); }
+.pill.bad { background: var(--bad-bg); color: var(--bad-fg); }
+.pill.warn { background: var(--s1-bg); color: var(--s1-fg); }
+.pill.good { background: var(--s3-bg); color: var(--s3-fg); }
+select.st { appearance: none; border: 0; border-radius: 999px; padding: 7px 28px 7px 13px; font-weight: 600; font-size: 13.5px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) 55%, calc(100% - 10px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+select.st:disabled { opacity: 1; cursor: default; background-image: none; padding-right: 13px; }
+select.st[data-s="0"] { background-color: var(--s0-bg); color: var(--s0-fg); }
+select.st[data-s="1"] { background-color: var(--s1-bg); color: var(--s1-fg); }
+select.st[data-s="2"] { background-color: var(--s2-bg); color: var(--s2-fg); }
+select.st[data-s="3"] { background-color: var(--s3-bg); color: var(--s3-fg); }
+select.st[data-s="4"] { background-color: var(--s4-bg); color: var(--s4-fg); }
+input[type="number"], input[type="url"], input[type="text"], input[type="date"], input[type="time"], textarea, select.plain {
+  border: 1px solid var(--line); background: var(--bg); border-radius: 9px; padding: 8px 10px; width: 100%; min-width: 0; color: var(--ink); }
+textarea { resize: vertical; }
+label.f { display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; color: var(--muted); }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.empty { border: 1px dashed var(--line); border-radius: 14px; padding: 22px; color: var(--muted); text-align: center; }
+.scroll { overflow-x: auto; }
+.prog { height: 8px; border-radius: 4px; background: var(--soft); overflow: hidden; min-width: 80px; }
+.prog i { display: block; height: 100%; background: var(--primary); border-radius: 4px; }
+
+/* KPIs e resumo */
+.strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.stat { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); border-radius: 16px; padding: 16px 18px; text-align: left; display: flex; flex-direction: column; gap: 7px; }
+.stat b { font-family: var(--font-display); font-size: 30px; line-height: 1; }
+.stat span { align-self: flex-start; }
+.stat[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; gap: 3px; }
+.kpi b { font-family: var(--font-display); font-size: 31px; line-height: 1.05; color: var(--primary); }
+.kpi span { color: var(--muted); font-size: 13.5px; }
+.next { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; background: var(--primary); color: var(--on-primary); border-radius: 16px; padding: 18px 22px; }
+.next small { text-transform: uppercase; letter-spacing: .08em; font-weight: 600; font-size: 11.5px; opacity: .85; }
+.next strong { font-family: var(--font-display); font-size: 20px; }
+.next .btn-link { margin-left: auto; background: transparent; border: 1px solid currentColor; color: inherit; border-radius: 9px; padding: 6px 14px; font-size: 13.5px; font-weight: 600; }
+
+/* Atenção */
+.attn { border-color: var(--accent); }
+.attn.ok { border-color: var(--line); }
+.attn h2 { display: flex; gap: 10px; align-items: center; }
+.attn h2 .count { font-size: 13px; background: var(--bad-bg); color: var(--bad-fg); border-radius: 999px; padding: 1px 10px; font-family: var(--font-body); }
+.attn-list { list-style: none; padding: 0 !important; display: flex; flex-direction: column; gap: 8px !important; }
+.attn-list li { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--bg); }
+.attn-list .txt { flex: 1 1 260px; min-width: 0; }
+
+/* Posts e stories */
+.week { display: flex; flex-direction: column; gap: 10px; }
+.week > h2 { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font-size: 19px; padding: 4px 2px; }
+.week > h2 small { font-family: var(--font-body); font-weight: 500; font-size: 13.5px; color: var(--muted); }
+.post { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: 16px; overflow: hidden; }
+.post.today { border-color: var(--accent); }
+.post .row { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; padding: 16px 20px; }
+.date { width: 58px; flex: none; text-align: center; background: var(--soft); border-radius: 10px; padding: 8px 0; display: flex; flex-direction: column; line-height: 1.1; }
+.date .d { font-family: var(--font-display); font-size: 25px; font-weight: 700; color: var(--primary); }
+.date .w, .date .m { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.main { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.tag { border: 1px solid var(--line); border-radius: 6px; padding: 1px 8px; font-size: 12.5px; color: var(--muted); }
+.net { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 6px; background: var(--soft); color: var(--primary); }
+.side { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.detail { border-top: 1px solid var(--line); padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px 28px; }
+.detail > div { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.checks { list-style: none !important; margin: 0; padding: 0 !important; display: flex; flex-direction: column; gap: 8px !important; }
+.checks label { display: flex; gap: 8px; align-items: flex-start; }
+.checks input { margin-top: 4px; accent-color: var(--accent); }
+.checks .done span { text-decoration: line-through; color: var(--muted); }
+.story-screens { display: flex; flex-direction: column; gap: 9px; }
+.story-screen { border: 1px solid var(--line); background: var(--bg); border-radius: 11px; padding: 10px 13px; }
+.story-screen-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin-bottom: 4px; }
+.story-screen-head b { font-size: 13px; color: var(--primary); }
+.story-screen-head span { font-size: 11px; color: var(--muted); }
+.story-screen p { overflow-wrap: anywhere; }
+.warnbox { background: var(--s1-bg); color: var(--s1-fg); border-radius: 10px; padding: 9px 12px; font-size: 13.5px; }
+
+/* Calendário e barras */
+.cal { min-width: 600px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal .h { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; padding: 2px 4px; }
+.cal .c { min-height: 92px; border-radius: 9px; background: var(--bg); padding: 5px; display: flex; flex-direction: column; gap: 3px; border: 1px solid var(--line); }
+.cal .c.off { background: transparent; border-color: transparent; }
+.cal .c.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.cal .n { font-size: 12px; color: var(--muted); font-weight: 600; }
+.cal .e { text-align: left; border: 0; border-radius: 6px; padding: 4px 6px; font-size: 12px; line-height: 1.25; font-weight: 600; }
+.cal .e[data-s="0"] { background: var(--s0-bg); color: var(--s0-fg); }
+.cal .e[data-s="1"] { background: var(--s1-bg); color: var(--s1-fg); }
+.cal .e[data-s="2"] { background: var(--s2-bg); color: var(--s2-fg); }
+.cal .e[data-s="3"] { background: var(--s3-bg); color: var(--s3-fg); }
+.cal .e[data-s="4"] { background: var(--s4-bg); color: var(--s4-fg); }
+.cal .sd { border: 0; background: transparent; padding: 0; display: flex; gap: 4px; align-items: center; font-size: 11px; color: var(--muted); }
+.cal .sd i { width: 9px; height: 9px; border-radius: 50%; background: var(--s0-fg); display: inline-block; }
+.cal .sd[data-s="1"] i { background: var(--s1-fg); } .cal .sd[data-s="2"] i { background: var(--s2-fg); }
+.cal .sd[data-s="3"] i { background: var(--s3-fg); } .cal .sd[data-s="4"] i { background: var(--primary); }
+.cal .fb { background: var(--accent); color: #fff; border-radius: 6px; padding: 3px 6px; font-size: 12px; font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.bars { display: flex; flex-direction: column; gap: 8px; }
+.bar { display: grid; grid-template-columns: minmax(120px, 1fr) 3fr auto; gap: 10px; align-items: center; font-size: 13.5px; }
+.bar i { display: block; height: 10px; border-radius: 5px; background: var(--primary); }
+
+/* Tabelas e gráfico */
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 11px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.num, th.num { text-align: right; }
+.chart { display: flex; flex-direction: column; gap: 8px; }
+.crow { display: grid; grid-template-columns: minmax(110px, 200px) 1fr 70px; gap: 10px; align-items: center; font-size: 13.5px; }
+.crow .t { min-width: 0; overflow-wrap: anywhere; }
+.track { height: 16px; display: flex; border-radius: 4px; overflow: hidden; background: var(--soft); }
+.track i { display: block; height: 100%; }
+.track i[data-n="ig"] { background: var(--c-ig); } .track i[data-n="fb"] { background: var(--c-fb); } .track i[data-n="tt"] { background: var(--c-tt); }
+.key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; background: var(--k); }
+.editor { background: var(--soft); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.editor .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.editor fieldset { border: 1px solid var(--line); border-radius: 10px; margin: 0; padding: 10px 12px 12px; min-width: 0; background: var(--surface); }
+.editor legend { font-weight: 600; padding: 0 6px; }
+.fields.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.goal { display: grid; grid-template-columns: minmax(150px, 1.3fr) 110px 110px minmax(120px, 1.4fr) 60px; gap: 10px 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.goal:last-child { border-bottom: 0; }
+.rank { list-style: none !important; padding: 0 !important; display: flex; flex-direction: column; gap: 6px !important; }
+.rank li { display: flex; justify-content: space-between; gap: 12px; }
+
+/* Drive, pendências, relatório */
+.linkbox { display: flex; flex-wrap: wrap; gap: 8px; }
+.linkbox input { flex: 1 1 280px; }
+.frow { display: grid; grid-template-columns: minmax(150px, 1.2fr) 2fr auto; gap: 8px 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.frow:last-child { border-bottom: 0; }
+.frow small { color: var(--muted); display: block; }
+.frow label.chk { display: flex; gap: 6px; align-items: center; font-size: 13.5px; white-space: nowrap; }
+input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+.prow { display: grid; grid-template-columns: 26px minmax(200px, 2fr) minmax(130px, 1fr) minmax(130px, 1fr) 110px; gap: 8px 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.prow.head { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); }
+.prow.done .ttl { text-decoration: line-through; color: var(--muted); }
+.prow small { display: block; color: var(--muted); }
+.report-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center; }
+.rep-logo { height: 34px; width: auto; display: none; }
+details.tools { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 20px; }
+details.tools summary { cursor: pointer; font-weight: 600; }
+
+input[type="email"], input[type="password"] { border: 1px solid var(--line); background: var(--bg); border-radius: 9px; padding: 8px 10px; width: 100%; color: var(--ink); }
+.userbox { display: flex; align-items: center; gap: 10px; color: #E3D9EA; font-size: 13.5px; position: relative; z-index: 1; flex-wrap: wrap; }
+.userbox .btn { background: transparent; color: #fff; border-color: rgba(255,255,255,.35); padding: 5px 12px; }
+.userbox .btn:hover { background: rgba(255,255,255,.12); }
+.login { max-width: 460px; margin: 0 auto; width: 100%; }
+body.locked .tabs, body.locked main, body.locked details.tools { display: none; }
+@media (max-width: 720px) {
+  body { padding-block: 12px 40px; }
+  .top { padding: 20px 18px; border-radius: 18px; }
+  .ide-official-logo { height: 40px; max-width: 150px; }
+  .logo-badge { padding: 9px 12px; border-radius: 14px; }
+  .brand { align-items: flex-start; }
+  .tabs { width: 100%; }
+  .panel { padding: 16px; }
+  .post .row { padding: 14px; }
+  .detail { padding: 16px; }
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .crow { grid-template-columns: 1fr 60px; } .crow .t { grid-column: 1 / -1; }
+  .frow { grid-template-columns: 1fr; }
+  .bar { grid-template-columns: 1fr auto; } .bar i { grid-column: 1 / -1; }
+  .goal { grid-template-columns: 1fr 1fr; } .goal > :first-child { grid-column: 1 / -1; }
+  .prow { grid-template-columns: 26px 1fr; } .prow > :nth-child(n+3) { grid-column: 2; }
+  .prow.head { display: none; }
+  .fields.three { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) { .chip, .tab, .btn { transition: background-color .15s, color .15s; } }
+@media print {
+  body { background: #fff; color: #000; padding: 0; }
+  .top, .noprint, details.tools, .notice, button, .tabs { display: none !important; }
+  .rep-logo { display: block; }
+  .panel, .post, .kpi { box-shadow: none; break-inside: avoid; }
+  .wrap { max-width: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo-badge"><img class="ide-official-logo" src="data:image/png;base64,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" alt="Ide+" width="300" height="155"></div>
+      <div>
+        <h1>Painel de marketing</h1>
+        <p id="subtitle"></p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Páginas do painel" id="tabs"></nav>
+    <div class="userbox" id="userbox" hidden></div>
+  </header>
+  <div id="notice" class="notice" role="status" hidden></div>
+  <main>
+    <section id="p-hoje" role="tabpanel" aria-labelledby="t-hoje"></section>
+    <section id="p-quadro" role="tabpanel" aria-labelledby="t-quadro" hidden></section>
+    <section id="p-stories" role="tabpanel" aria-labelledby="t-stories" hidden></section>
+    <section id="p-pendencias" role="tabpanel" aria-labelledby="t-pendencias" hidden></section>
+    <section id="p-programacao" role="tabpanel" aria-labelledby="t-programacao" hidden></section>
+    <section id="p-engajamento" role="tabpanel" aria-labelledby="t-engajamento" hidden></section>
+    <section id="p-drive" role="tabpanel" aria-labelledby="t-drive" hidden></section>
+    <section id="p-relatorio" role="tabpanel" aria-labelledby="t-relatorio" hidden></section>
+    <section id="p-equipe" role="tabpanel" aria-labelledby="t-equipe" hidden></section>
+  </main>
+  <details class="tools" id="tools">
+    <summary>Ferramentas e backup</summary>
+    <div class="col" style="margin-top:14px">
+      <p id="backup-status" class="none"></p>
+      <div class="linkbox">
+        <button class="btn" data-act="export">Baixar backup</button>
+        <button class="btn" data-act="copy-backup">Copiar backup</button>
+        <button class="btn" data-act="import">Importar arquivo</button>
+        <input id="backup-file" type="file" accept=".json,application/json" hidden>
+      </div>
+      <label class="f">Ou cole aqui o texto de um backup
+        <textarea id="backup-paste" rows="3" placeholder="Cole o conteúdo do backup (JSON) e clique em Revisar"></textarea></label>
+      <div class="linkbox"><button class="btn" data-act="import-paste">Revisar backup colado</button></div>
+      <div id="import-confirm" hidden></div>
+      <p class="none">Dica: se o arquivo não for baixado (alguns navegadores embutidos bloqueiam), use "Copiar backup" e guarde o texto em um documento.</p>
+    </div>
+  </details>
+</div>
+
+<script src="config.js"></script>
+<script type="application/json" id="cycle-data">{"id": "ciclo1", "name": "Ciclo 1", "start": "2026-10-19", "end": "2026-11-13", "weeks": {"1": "19 a 25/10", "2": "26/10 a 01/11", "3": "02 a 08/11", "4": "09 a 13/11"}, "posts": [{"id": "p01", "date": "2026-10-19", "week": 1, "title": "Pontos marcantes do DF", "format": "Reel / vídeo", "nets": ["ig", "fb", "tt"], "aud": "Marca", "pillar": "Identidade brasiliense", "summary": "Cortes rápidos na Ponte JK, Parque de Águas Claras, Estações, Eixo Monumental e Praça do Relógio. Texto na tela e áudio: \"Não importa se você está em Águas Claras, Plano Piloto ou em qualquer cantinho do DF... Existe alguém que sempre estará com você.\" Assinatura: Ide+, de Brasília para o Brasil.", "et": "Curioso espiando pelo canto em 2 ou 3 cortes. Piscando ao lado da logo no fechamento.", "caption": "", "files": "Vídeo final 9:16, capa e legenda", "pend": ["Definir como o ET aparece na assinatura (rápido ou pousando)"]}, {"id": "p02", "date": "2026-10-21", "week": 1, "title": "O que você, motorista, pode ganhar com a Ide+", "format": "Carrossel (TikTok em vídeo curto)", "nets": ["ig", "fb", "tt"], "aud": "Motorista", "pillar": "Captação de motoristas", "summary": "6 slides: capa, adesão baixa, mais ganho por corrida, suporte humano, feita em Brasília e chamada para cadastro pelo link da bio. No TikTok vira vídeo de 15 a 20 segundos.", "et": "Feliz na capa e no CTA, Curioso com carteira no slide 2, Surpreso no slide 3, Feliz de fone no slide 4, Piscando no slide 5.", "caption": "", "files": "Slides em 1080 x 1350, capa e legenda", "pend": ["Valor da tarifa de adesão", "Porcentagem da corrida que fica com o motorista", "Confirmar se o suporte humano já funciona e o horário"]}, {"id": "p03", "date": "2026-10-23", "week": 1, "title": "POV do ar-condicionado", "format": "Reel / vídeo", "nets": ["ig", "fb", "tt"], "aud": "Passageiro", "pillar": "Estilo de vida e humor", "summary": "10 a 15 segundos. Pessoa anda 5 minutos no sol, entra na Ide+ e sente o ar gelado. O som de rua corta para silêncio quando a porta fecha. Gravar entre 11h e 15h.", "et": "Aparece só no alívio: óculos escuros, com um pop no canto. Piscando na tela final.", "caption": "Quem vive o clima do DF sabe o valor de um carro geladinho no meio da tarde. Já pediu o seu hoje?", "files": "Vídeo final 9:16, capa e legenda", "pend": ["Confirmar se a frota tem ar-condicionado garantido"]}, {"id": "p04", "date": "2026-10-26", "week": 2, "title": "Trilha sonora do brasiliense", "format": "Reel / vídeo", "nets": ["ig", "fb", "tt"], "aud": "Passageiro", "pillar": "Estilo de vida e humor", "summary": "15 a 20 segundos. Cortes de pessoas curtindo o trajeto, com os textos \"Cada corrida tem a sua trilha\" e \"Qual é a sua?\". Áudio só da biblioteca comercial das plataformas.", "et": "De fone, balançando no ritmo da batida. Curtindo nos cortes e Piscando no fim.", "caption": "Aquele momento do dia em que você só quer encostar no banco e relaxar. Qual música não pode faltar na sua corrida? Conta aqui nos comentários.", "files": "Vídeo final 9:16, capa e legenda", "pend": ["Escolher a faixa de áudio da biblioteca comercial", "Termos de uso de imagem assinados"]}, {"id": "p05", "date": "2026-10-28", "week": 2, "title": "Quiz: qual tipo de passageiro é você?", "format": "Carrossel", "nets": ["ig", "fb"], "aud": "Passageiro", "pillar": "Estilo de vida e humor", "summary": "6 slides com quatro perfis: Apressado da Esplanada, Inimigo do Sol, Turista no Próprio Quadrado e DJ do Carro. O último slide pede comentário e marcação de amigos.", "et": "Um ET diferente por perfil, com a expressão e o acessório do tema.", "caption": "Todo brasiliense se encaixa em pelo menos um. Qual é o seu? Comenta e marca aquele amigo que é a cara de um deles.", "files": "Slides em 1080 x 1350, capa e legenda", "pend": []}, {"id": "p06", "date": "2026-10-30", "week": 2, "title": "Depoimento do fundador", "format": "Reel / vídeo", "nets": ["ig", "fb", "tt"], "aud": "Marca", "pillar": "Prova social e confiança", "summary": "25 a 30 segundos. O fundador explica por que criou a Ide+, falando direto para a câmera, em tom de conversa e sem decorar. Fecha com \"Feita aqui. Para quem vive aqui.\"", "et": "Curioso na abertura. Fora de cena durante a fala. Piscando com balão no final.", "caption": "", "files": "Vídeo final 9:16, capa e legenda", "pend": ["Motivo real da criação da Ide+", "Compromisso principal da empresa", "Termo de uso de imagem do fundador"]}, {"id": "p07", "date": "2026-11-02", "week": 3, "title": "Quem faz a Ide+ acontecer", "format": "Reel / vídeo", "nets": ["ig", "fb", "tt"], "aud": "Marca", "pillar": "Prova social e confiança", "summary": "15 segundos. Entrevista com um motorista parceiro ou passageiro: \"O que não pode faltar na sua corrida pela cidade?\". Dia de Finados, então o tom é neutro e acolhedor.", "et": "Feliz na abertura. Piscando ao lado da logo no final.", "caption": "Por trás de cada corrida tem gente de verdade. Hoje, a gente apresenta quem faz a Ide+ acontecer.", "files": "Vídeo final 9:16, capa e legenda", "pend": ["Termo de uso de imagem do entrevistado", "Manter tom neutro, sem humor (Finados)"]}, {"id": "p08", "date": "2026-11-04", "week": 3, "title": "Lugares de Brasília que você precisa conhecer", "format": "Carrossel", "nets": ["ig", "fb"], "aud": "Passageiro", "pillar": "Identidade brasiliense", "summary": "8 slides: Quadra Modelo, Ernesto na 115 Sul, Memorial JK, Mané Mercado em Águas Claras, Cine Araújo e Casa de Chá, cada um com foto real e uma frase curta.", "et": "Turista do espaço em cada lugar, com balão de fala.", "caption": "Brasília tem muito mais que o Plano Piloto. Salva este post pro próximo rolê e conta aqui qual é o seu favorito.", "files": "Slides em 1080 x 1350, capa e legenda", "pend": ["Escrever a frase de cada um dos 6 lugares", "Confirmar endereços e horários"]}, {"id": "p09", "date": "2026-11-06", "week": 3, "title": "5 perrengues de quem anda de app no DF", "format": "Carrossel", "nets": ["ig", "fb"], "aud": "Passageiro", "pillar": "Estilo de vida e humor", "summary": "7 slides sobre perrengues de app em geral: teste do forno, labirinto da tesourinha, \"tô chegando\" que não chega, fone que não funcionou e chuva do nada. Sem zombar dos motoristas.", "et": "Sofrendo ou Surpreso em cada perrengue. Piscando no CTA.", "caption": "", "files": "Slides em 1080 x 1350, capa e legenda", "pend": ["Definir o diferencial real do slide final", "Confirmar se existe tarifa dinâmica"]}, {"id": "p10", "date": "2026-11-09", "week": 4, "title": "Desconto na primeira corrida", "format": "Reel / vídeo", "nets": ["ig", "fb", "tt"], "aud": "Passageiro", "pillar": "Vantagens para o passageiro", "summary": "10 a 15 segundos. Pessoa abre o app, vê o desconto aplicado no pedido e entra no carro. Texto: \"Primeira vez na Ide+?\" e o percentual do desconto.", "et": "Curioso na abertura, Surpreso ao lado do número, Feliz com balão \"Bora?\".", "caption": "Sua primeira corrida na Ide+ tem desconto. Baixe o app e peça a sua.", "files": "Vídeo final 9:16, capa e legenda", "pend": ["Percentual ou valor do desconto, cupom, validade e regras"]}, {"id": "p11", "date": "2026-11-11", "week": 4, "title": "3 motivos para pedir uma Ide+", "format": "Carrossel", "nets": ["ig", "fb"], "aud": "Passageiro", "pillar": "Vantagens para o passageiro", "summary": "5 slides: preço justo, menos espera, mais segurança e chamada para baixar o app. Cada slide só entra com dado real; se não houver, o slide sai.", "et": "Carteira no preço, relógio na espera, balão de cadeado na segurança.", "caption": "Pensada em Brasília, feita para o seu dia a dia. Qual desses motivos pesa mais pra você?", "files": "Slides em 1080 x 1350, capa e legenda", "pend": ["Dado real de preço", "Tempo médio de espera por região", "Recursos de segurança do app"]}, {"id": "p12", "date": "2026-11-13", "week": 4, "title": "Ide+ Lady", "format": "Reel / vídeo", "nets": ["ig", "fb", "tt"], "aud": "Passageiro", "pillar": "Vantagens para o passageiro", "summary": "15 segundos. \"De mulher para mulher.\" Categoria exclusiva para mulheres, com motoristas mulheres, a partir da arte enviada. Mostra a categoria dentro do app.", "et": "Surpreso entrando de canto, Feliz, Curioso com balão \"Já viu?\" e Piscando no final.", "caption": "Mais conforto e tranquilidade para o seu trajeto. A Ide+ Lady é exclusiva para mulheres, com motoristas mulheres. Conheça as categorias no app.", "files": "Vídeo final 9:16, capa e legenda", "pend": ["Confirmar se a categoria está ativa e em quais regiões", "Refazer a arte com o ET minimalista"]}], "stories": [{"id": "s1019", "date": "2026-10-19", "week": 1, "title": "Pontos do DF e desconto", "script": "1. Repost do Reel “Pontos do DF”. 2. Desconto na primeira corrida, só se os termos estiverem confirmados. 3. “Pra onde você se deslocou hoje?”", "sticker": "Enquete, link", "et": "Surpreso, Curioso"}, {"id": "s1020", "date": "2026-10-20", "week": 1, "title": "Apresentar o ET", "script": "1. O ET se apresenta com o balão “Si tu diz, tá dizido”. 2. “Feita em Brasília, para quem vive aqui.” 3. “Qual é o lugar mais icônico de Brasília?”", "sticker": "Enquete", "et": "Feliz, Curioso"}, {"id": "s1021", "date": "2026-10-21", "week": 1, "title": "Captar motoristas", "script": "1. Teaser “Motorista, quanto sobra no seu bolso?”. 2. Repost do carrossel do motorista. 3. “Quer rodar com a Ide+? Link do cadastro.”", "sticker": "Link, caixinha", "et": "Surpreso, Piscando"}, {"id": "s1022", "date": "2026-10-22", "week": 1, "title": "Tirar dúvidas dos motoristas", "script": "1. “O que você quer saber sobre rodar com a Ide+?” 2. Respostas às perguntas, as que já puderem ser respondidas. 3. Teaser do POV de sexta.", "sticker": "Caixinha, lembrete", "et": "Curioso, Feliz"}, {"id": "s1023", "date": "2026-10-23", "week": 1, "title": "POV do ar-condicionado", "script": "1. “Quantos graus você sente hoje?” 2. Repost do Reel do POV. 3. “Anda no sol ou pede um carro geladinho?”", "sticker": "Controle deslizante, enquete", "et": "Alívio, Curioso"}, {"id": "s1024", "date": "2026-10-24", "week": 1, "title": "Lazer", "script": "“Sábado no DF: Feira da Torre de TV ou pôr do sol na Ponte JK?”", "sticker": "Enquete", "et": "Curioso"}, {"id": "s1025", "date": "2026-10-25", "week": 1, "title": "Lazer e prévia", "script": "1. “Domingo no Eixão do Lazer ou no Parque da Cidade?” 2. “Segunda tem a trilha sonora do brasiliense.”", "sticker": "Enquete, lembrete", "et": "Curioso, Piscando"}, {"id": "s1026", "date": "2026-10-26", "week": 2, "title": "Trilha sonora", "script": "1. Repost do Reel. 2. “Qual música não pode faltar na sua corrida?” 3. “Rock, reggae ou pop?”", "sticker": "Caixinha, enquete", "et": "Curtindo"}, {"id": "s1027", "date": "2026-10-27", "week": 2, "title": "Playlist feita pelo público", "script": "1. As respostas mais legais, com permissão. 2. Teaser do quiz: “Amanhã: qual passageiro você é?”", "sticker": "Lembrete", "et": "Feliz, Curioso"}, {"id": "s1028", "date": "2026-10-28", "week": 2, "title": "Quiz do passageiro", "script": "1. Quiz “Qual dessas frases é a sua?” 2. Repost do carrossel. 3. “Marque quem é o Apressado da Esplanada.”", "sticker": "Quiz, marcação", "et": "Surpreso, Piscando"}, {"id": "s1029", "date": "2026-10-29", "week": 2, "title": "Bastidores e teaser", "script": "1. Bastidores das gravações da semana. 2. Teaser “Amanhã: por que criamos a Ide+?”", "sticker": "Lembrete", "et": "Feliz, Curioso"}, {"id": "s1030", "date": "2026-10-30", "week": 2, "title": "Depoimento do fundador", "script": "1. Trecho do vídeo do fundador. 2. Repost do Reel. 3. “Pergunte ao fundador.”", "sticker": "Caixinha", "et": "Curioso, Piscando"}, {"id": "s1031", "date": "2026-10-31", "week": 2, "title": "Halloween com o ET", "script": "1. O ET de fantasia (óculos escuros, capa ou chapéu). 2. “Fantasia: brasiliense raiz ou ET?”", "sticker": "Enquete", "et": "Surpreso, Feliz"}, {"id": "s1101", "date": "2026-11-01", "week": 2, "title": "Respostas e prévia", "script": "1. Respostas do fundador, as que já puderem ser respondidas. 2. Aviso “Segunda: quem faz a Ide+ acontecer.”", "sticker": "Caixinha", "et": "Feliz"}, {"id": "s1102", "date": "2026-11-02", "week": 3, "title": "Finados: tom neutro", "script": "1. Repost do Reel “Quem faz a Ide+ acontecer”. 2. Agradecimento a quem faz a Ide+ acontecer. Sem enquete e sem humor.", "sticker": "Nenhuma", "et": "Feliz"}, {"id": "s1103", "date": "2026-11-03", "week": 3, "title": "Teaser dos lugares", "script": "1. “Quais desses lugares você já conhece?” (Quadra Modelo, Memorial JK, Casa de Chá). 2. “Amanhã: 6 lugares de Brasília.”", "sticker": "Enquete, lembrete", "et": "Curioso"}, {"id": "s1104", "date": "2026-11-04", "week": 3, "title": "Lugares de Brasília", "script": "1. Repost do carrossel. 2. Um story por lugar, com a figurinha de localização. 3. “Qual é o seu lugar favorito em Brasília?”", "sticker": "Localização, caixinha", "et": "Surpreso, Feliz"}, {"id": "s1105", "date": "2026-11-05", "week": 3, "title": "Perrengues de app", "script": "1. “Qual é o seu pior perrengue de app?” 2. Teaser “Amanhã: 5 perrengues de quem anda de app.”", "sticker": "Caixinha, lembrete", "et": "Sofrendo, Curioso"}, {"id": "s1106", "date": "2026-11-06", "week": 3, "title": "5 perrengues", "script": "1. Repost do carrossel. 2. “Qual desses você já viveu?” 3. Reposts das respostas de ontem, com permissão.", "sticker": "Enquete, caixinha", "et": "Sofrendo, Piscando"}, {"id": "s1107", "date": "2026-11-07", "week": 3, "title": "Lazer", "script": "“Sábado: café na 115 Sul ou cinema no Cine Araújo?”", "sticker": "Enquete", "et": "Curioso"}, {"id": "s1108", "date": "2026-11-08", "week": 3, "title": "Prévia da semana", "script": "1. “Segunda tem desconto na primeira corrida”, só com os termos confirmados.", "sticker": "Lembrete", "et": "Piscando"}, {"id": "s1109", "date": "2026-11-09", "week": 4, "title": "Desconto na primeira corrida", "script": "1. “Primeira vez na Ide+?” 2. Desconto e cupom, com validade e regras. 3. Link para baixar o app.", "sticker": "Link, contagem regressiva", "et": "Curioso, Surpreso"}, {"id": "s1110", "date": "2026-11-10", "week": 4, "title": "Como pedir a primeira corrida", "script": "1. Como pedir em 3 passos, os passos reais do app. 2. “Dúvidas sobre o desconto?”", "sticker": "Caixinha", "et": "Feliz"}, {"id": "s1111", "date": "2026-11-11", "week": 4, "title": "3 motivos para pedir", "script": "1. Repost do carrossel. 2. “O que pesa mais para você: preço, espera ou segurança?” 3. Um story por motivo, só com dado real.", "sticker": "Quiz", "et": "Surpreso, Curioso"}, {"id": "s1112", "date": "2026-11-12", "week": 4, "title": "Teaser da Ide+ Lady", "script": "1. “Amanhã tem novidade para elas.” 2. Pergunta sobre o que mais importa em uma corrida.", "sticker": "Lembrete, caixinha", "et": "Surpreso"}, {"id": "s1113", "date": "2026-11-13", "week": 4, "title": "Ide+ Lady e fim do ciclo", "script": "1. Arte da Ide+ Lady e repost do Reel. 2. “Marque uma amiga.” 3. Agradecimento pelo Ciclo 1. 4. “O que você quer ver no próximo mês?”", "sticker": "Marcação, caixinha", "et": "Feliz, Piscando"}], "guidance": {"1019": "Abra com o Reel sobre os pontos do DF, contextualize a marca e convide o público a participar. Só mencione desconto caso todos os termos estejam aprovados.", "1020": "Apresente o ET como personagem recorrente da marca, com linguagem próxima e referência a Brasília. Feche com uma pergunta fácil de responder.", "1021": "Fale diretamente com motoristas. Crie curiosidade sobre os ganhos, apresente o post e leve ao cadastro; não divulgue taxas sem validação.", "1022": "Transforme dúvidas dos motoristas em conversa. Publique apenas respostas já confirmadas e prepare o público para o vídeo de sexta.", "1023": "Explore o contraste entre o calor de Brasília e o conforto da viagem. Evite garantir ar-condicionado em toda a frota sem confirmação.", "1024": "Mantenha o sábado leve, com uma escolha divertida entre passeios conhecidos do DF.", "1025": "Use uma enquete de lazer para gerar participação e termine antecipando o tema musical da segunda-feira.", "1026": "Convide as pessoas a contar suas músicas de viagem. Reaproveite o Reel para reforçar o assunto e estimule respostas.", "1027": "Valorize respostas reais enviadas pelos seguidores, com permissão, e deixe uma pista sobre o quiz do dia seguinte.", "1028": "Ajude o público a se reconhecer nos perfis do carrossel. Promova o post e incentive marcações de amigos.", "1029": "Mostre cenas espontâneas da produção para aproximar a marca das pessoas e prepare a fala do fundador.", "1030": "Use um trecho genuíno do fundador como abertura, encaminhe para o Reel completo e abra espaço para perguntas.", "1031": "Aproveite o Halloween de forma descontraída com o ET, sem perder o visual da marca.", "1101": "Compartilhe perguntas respondidas pelo fundador, quando disponíveis, e introduza o conteúdo humano da próxima semana.", "1102": "Por ser Finados, mantenha a comunicação sóbria, agradecendo a participação de quem faz a Ide+ acontecer, sem humor.", "1103": "Aqueça o interesse pelo carrossel de lugares de Brasília, usando enquete sobre locais que o público conhece.", "1104": "Use imagens reais dos lugares citados no post, indique sua localização e pergunte qual deles o público prefere.", "1105": "Peça histórias de perrengues de aplicativos sem expor pessoas ou ridicularizar motoristas. Anuncie o carrossel de sexta.", "1106": "Divulgue o carrossel e amplie a conversa com uma pergunta simples; só republique respostas com autorização.", "1107": "Faça uma enquete descomplicada de lazer local para incentivar respostas no fim de semana.", "1108": "Antecipe a campanha de primeira corrida apenas se desconto, cupom, validade e condições já estiverem aprovados.", "1109": "Explique a oferta com clareza, incluindo regras, validade e link oficial. Se a promoção não estiver confirmada, substitua por apresentação do app.", "1110": "Mostre o processo real de solicitar uma corrida no aplicativo, com telas atualizadas, e acolha dúvidas.", "1111": "Retome os três motivos do carrossel sem usar números ou vantagens que a operação não comprove.", "1112": "Crie expectativa para a Ide+ Lady sem prometer disponibilidade antes de confirmar categoria e regiões atendidas.", "1113": "Apresente a categoria apenas com as condições efetivamente confirmadas. Agradeça o público e colete ideias para o próximo ciclo."}, "storyPost": {"s1019": ["p01"], "s1021": ["p02"], "s1022": ["p02"], "s1023": ["p03"], "s1026": ["p04"], "s1027": ["p04"], "s1028": ["p05"], "s1029": ["p06"], "s1030": ["p06"], "s1101": ["p06"], "s1102": ["p07"], "s1103": ["p08"], "s1104": ["p08"], "s1105": ["p09"], "s1106": ["p09"], "s1109": ["p10"], "s1110": ["p10"], "s1111": ["p11"], "s1112": ["p12"], "s1113": ["p12"]}, "dep": {"s1019": ["p10"], "s1021": ["p02"], "s1022": ["p02"], "s1023": ["p03"], "s1030": ["p06"], "s1101": ["p06"], "s1108": ["p10"], "s1109": ["p10"], "s1110": ["p10"], "s1111": ["p11"], "s1112": ["p12"], "s1113": ["p12"], "s1104": ["p08"], "s1106": ["p09"]}, "routine": ["Três posts de feed por semana: segunda, quarta e sexta, em TikTok, Instagram e Facebook.", "Stories todos os dias no Instagram e no Facebook, ligados ao post da semana.", "Cada post só vai ao ar com status Aprovado e sem pendências abertas.", "Toda sexta, registrar as métricas dos posts e dos stories na aba Engajamento.", "Ao fim do ciclo (após 13/11), reunião de feedback com a diretoria."], "months": {"2026-10": "Apresentação da marca, identidade brasiliense e captação de motoristas.", "2026-11": "Rostos reais, lugares de Brasília, vantagens para o passageiro e fechamento do ciclo com a Ide+ Lady."}, "storyRules": ["ET em todos os stories, pequeno e fora da área do texto.", "Uma ideia por tela, frase curta, legível em 3 segundos.", "Dados (adesão, % do motorista, desconto) só aparecem quando a diretoria confirmar.", "Áudio somente da biblioteca comercial da plataforma.", "Termo de uso de imagem para quem aparece.", "Sem humor em 02/11 (Finados). Responder caixinhas em até 24 horas."], "goals": [{"key": "views", "label": "Alcance total", "auto": "views"}, {"key": "rate", "label": "Taxa de engajamento", "auto": "rate"}, {"key": "drivers", "label": "Cadastros de motoristas"}, {"key": "downloads", "label": "Downloads do app"}, {"key": "rides", "label": "Primeiras corridas"}, {"key": "followers", "label": "Novos seguidores"}], "feedbackChecklist": ["Métricas de posts e stories registradas", "Metas comparadas com os resultados", "Avaliação do design e do uso do ET", "Resultados por público (motorista e passageiro)", "Avaliação do processo (prazos, pendências, aprovações)", "Decisões para o Ciclo 2"]}</script>
+<script>
+(function () {
+  'use strict';
+  /* ---------- Dados do ciclo (bloco JSON separado, trocável no Ciclo 2) ---------- */
+  var CYCLE = JSON.parse(document.getElementById('cycle-data').textContent);
+  var POSTS = CYCLE.posts, STORIES = CYCLE.stories;
+  var NETS = { ig: 'Instagram', fb: 'Facebook', tt: 'TikTok' };
+  var STATUS = ['Roteiro', 'Aguardando dados', 'Em produção', 'Aprovado', 'Publicado'];
+  var DOW = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  var DOWL = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+  var MON = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  var MONL = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  var TABS = [['hoje', 'Hoje'], ['quadro', 'Posts'], ['stories', 'Stories'], ['pendencias', 'Pendências'], ['programacao', 'Programação'], ['engajamento', 'Engajamento'], ['drive', 'Drive'], ['relatorio', 'Relatório'], ['equipe', 'Equipe']];
+  var KEY_V2 = 'ideplus-painel-' + CYCLE.id + '-v2', KEY_V1 = 'ideplus-painel-marketing-ciclo1-v1', LB_KEY = 'ideplus-lastbackup-' + CYCLE.id;
+
+  /* ---------- Utilidades ---------- */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function pd(s) { var a = s.split('-'); return new Date(+a[0], +a[1] - 1, +a[2]); }
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function dayDiff(a, b) { return Math.round((a - b) / 864e5); }
+  function fmt(n) { return Number(n || 0).toLocaleString('pt-BR'); }
+  function pct(a, b) { return b ? (a / b * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '0,0%'; }
+  function dm(s) { var d = pd(s); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); }
+  function today() { var t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function plural(n, a, b) { return n + ' ' + (n === 1 ? a : b); }
+  function byId(id) { return POSTS.filter(function (p) { return p.id === id; })[0]; }
+  function sById(id) { return STORIES.filter(function (s) { return s.id === id; })[0]; }
+  function merge(t, s) {
+    Object.keys(s).forEach(function (k) {
+      var v = s[k];
+      if (v === null) delete t[k];
+      else if (v && typeof v === 'object' && !Array.isArray(v)) { if (!t[k] || typeof t[k] !== 'object') t[k] = {}; merge(t[k], v); }
+      else t[k] = v;
+    });
+  }
+  function setText(id, v) { var e = $(id); if (e && e.textContent !== v) e.textContent = v; }
+  function numOrNull(v) { v = String(v).trim().replace(',', '.'); if (v === '') return null; var n = Number(v); return isFinite(n) && n >= 0 ? n : null; }
+
+  /* ---------- Estado e armazenamento ---------- */
+  var S = {}, SS = {}, META = { drive: { url: '' }, goals: {}, feedback: { date: '', checks: {} } };
+  var db = null, remote = null, sb = null, perfil = null, canWrite = true, storageOK = false, chain = {}, pendingImport = null;
+  var team = null;
+  var view = 'hoje', fWeek = 0, fStatus = -1, openId = null, storyOpen = null, storyWeek = 0, editId = null, pFilter = 'abertas', pOwner = '', pasteText = '';
+
+  function localSave() {
+    if (!storageOK) { setBackupStatus(); return; }
+    try { localStorage.setItem(KEY_V2, JSON.stringify({ version: 2, app: 'ideplus-painel-marketing', cycle: CYCLE.id, posts: S, stories: SS, meta: META, updatedAt: new Date().toISOString() })); }
+    catch (e) { storageOK = false; note('O navegador não permitiu salvar neste computador. Baixe um backup para não perder as alterações.', true); }
+    setBackupStatus();
+  }
+  function normMeta(m) {
+    m = m && typeof m === 'object' ? m : {};
+    return { drive: { url: m.drive && typeof m.drive.url === 'string' ? m.drive.url : '' }, goals: m.goals && typeof m.goals === 'object' ? m.goals : {},
+      feedback: { date: m.feedback && typeof m.feedback.date === 'string' ? m.feedback.date : '', checks: m.feedback && m.feedback.checks && typeof m.feedback.checks === 'object' ? m.feedback.checks : {} } };
+  }
+  function loadLocal() {
+    try {
+      localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); storageOK = true;
+      var raw = localStorage.getItem(KEY_V2), d;
+      if (raw) { d = JSON.parse(raw); if (d && d.posts) { S = d.posts; SS = d.stories || {}; META = normMeta(d.meta); return; } }
+      raw = localStorage.getItem(KEY_V1);
+      if (raw) { d = JSON.parse(raw); if (d && d.version === 1 && d.posts) { S = d.posts; SS = d.stories || {}; META = normMeta({ drive: d.drive }); localSave(); note('Dados da versão anterior do painel foram recuperados.'); } }
+    } catch (e) { storageOK = false; }
+  }
+  function dbWrite(path, data) {
+    var prev = chain[path] || Promise.resolve();
+    chain[path] = prev.then(function () { return db.doc(path).set(clone(data)); }).catch(function (e) {
+      if (e && e.code === 'invalid_argument') { canWrite = false; note('Você pode ver o painel, mas não pode editar. Peça acesso de colaborador ao dono.', true); render(); }
+      else note('Não foi possível salvar agora. Tente de novo em instantes.', true);
+    });
+  }
+  var rchain = {};
+  function remoteSave(key, data) {
+    var prev = rchain[key] || Promise.resolve();
+    rchain[key] = prev.then(function () { return sb.from('painel').upsert({ chave: key, dados: clone(data) }); }).then(function (r) {
+      if (r && r.error) note('Não foi possível salvar agora (' + (r.error.message || 'erro') + '). Confira sua conexão e seu perfil de editor.', true);
+    }, function () { note('Não foi possível salvar agora. Confira sua conexão.', true); });
+  }
+  function persist(kind, id) {
+    if (remote) { remoteSave(kind === 'p' ? 'post:' + id : kind === 's' ? 'story:' + id : 'meta', kind === 'p' ? S[id] : kind === 's' ? SS[id] : META); }
+    else if (db) { if (kind === 'p') dbWrite('posts/' + id, S[id]); else if (kind === 's') dbWrite('stories/' + id, SS[id]); else dbWrite('config/main', META); }
+    else localSave();
+  }
+  function savePost(id, patch) { var c = clone(S[id] || {}); merge(c, patch); S[id] = c; persist('p', id); }
+  function saveStory(id, patch) { var c = clone(SS[id] || {}); merge(c, patch); SS[id] = c; persist('s', id); }
+  function saveMeta(patch) { merge(META, patch); persist('m'); }
+  function note(msg, bad) { var n = $('notice'); n.textContent = msg || ''; n.hidden = !msg; n.className = 'notice' + (bad ? ' bad' : ''); }
+
+  /* ---------- Acessores ---------- */
+  function doc(id) { return S[id] || {}; }
+  function sdoc(id) { return SS[id] || {}; }
+  function st(id) { var v = doc(id).status; return Number.isInteger(v) && v >= 0 && v < 5 ? v : 0; }
+  function sst(id) { var v = sdoc(id).status; return Number.isInteger(v) && v >= 0 && v < 5 ? v : 0; }
+  function pendDone(p, i) { return !!(doc(p.id).pend || {})[i]; }
+  function pendOpen(p) { return p.pend.filter(function (_, i) { return !pendDone(p, i); }).length; }
+  function pendDue(p, i) { return (doc(p.id).pdue || {})[i] || iso(addDays(pd(p.date), -2)); }
+  function pendOwnerOf(p, i) { return (doc(p.id).po || {})[i] || ''; }
+  function mv(id, n, k) { var m = doc(id).m; return (m && m[n] && Number(m[n][k])) || 0; }
+  function inter(id, n) {
+    var m = (doc(id).m || {})[n] || {};
+    if (m.inter != null && m.inter !== '') return Number(m.inter) || 0;
+    return (Number(m.likes) || 0) + (Number(m.comments) || 0) + (Number(m.shares) || 0) + (Number(m.saves) || 0);
+  }
+  function fmtGroup(p) { return /^carrossel/i.test(p.format) ? 'Carrossel' : 'Reel / vídeo'; }
+  function depOpen(sid) { var n = 0; (CYCLE.dep[sid] || []).forEach(function (pid) { var p = byId(pid); if (p) n += pendOpen(p); }); return n; }
+  function owners() {
+    var o = {};
+    POSTS.forEach(function (p) { var d = doc(p.id); if (d.owner) o[d.owner] = 1; Object.keys(d.po || {}).forEach(function (k) { if (d.po[k]) o[d.po[k]] = 1; }); });
+    return Object.keys(o).sort();
+  }
+
+  /* ---------- Cálculos ---------- */
+  function postTotals(p) {
+    var v = 0, i = 0, c = 0, seg = {};
+    p.nets.forEach(function (n) { var a = mv(p.id, n, 'views'), b = inter(p.id, n), k = mv(p.id, n, 'clicks'); v += a; i += b; c += k; seg[n] = b; });
+    return { v: v, i: i, c: c, seg: seg, has: v + i + c > 0 };
+  }
+  function engAgg() {
+    var byNet = { ig: { v: 0, i: 0, c: 0 }, fb: { v: 0, i: 0, c: 0 }, tt: { v: 0, i: 0, c: 0 } }, rows = [], tv = 0, ti = 0, tc = 0;
+    POSTS.forEach(function (p) {
+      var t = postTotals(p); rows.push({ p: p, v: t.v, i: t.i, c: t.c, seg: t.seg, has: t.has }); tv += t.v; ti += t.i; tc += t.c;
+      p.nets.forEach(function (n) { byNet[n].v += mv(p.id, n, 'views'); byNet[n].i += inter(p.id, n); byNet[n].c += mv(p.id, n, 'clicks'); });
+    });
+    return { rows: rows, byNet: byNet, tv: tv, ti: ti, tc: tc };
+  }
+  function groupBy(rows, fn) {
+    var g = {}, order = [];
+    rows.forEach(function (r) { var k = fn(r.p); if (!g[k]) { g[k] = { n: 0, v: 0, i: 0 }; order.push(k); } if (r.has) { g[k].n++; g[k].v += r.v; g[k].i += r.i; } });
+    return order.map(function (k) { return { k: k, n: g[k].n, v: g[k].v, i: g[k].i }; });
+  }
+  function storyAgg(week) {
+    var a = { days: 0, views: 0, replies: 0, links: 0, exits: 0 };
+    STORIES.forEach(function (s) {
+      if (week && s.week !== week) return;
+      var x = sdoc(s.id), v = Number(x.views) || 0;
+      if (v > 0) { a.days++; a.views += v; a.replies += Number(x.replies) || 0; a.links += Number(x.links) || 0; a.exits += Number(x.exits) || 0; }
+    });
+    return a;
+  }
+  function retention(x) { var v = Number(x.views) || 0; return v ? pct(Math.max(v - (Number(x.exits) || 0), 0), v) : '-'; }
+  function attention() {
+    var t = today(), lim = addDays(t, 7), out = [];
+    POSTS.forEach(function (p) {
+      var d = pd(p.date), s = st(p.id), open = pendOpen(p);
+      if (s === 4 || d > lim) return;
+      var days = dayDiff(d, t), when = days === 0 ? 'hoje' : days === 1 ? 'amanhã' : days < 0 ? 'há ' + (-days) + (days === -1 ? ' dia' : ' dias') : 'em ' + days + ' dias';
+      var why = [];
+      if (open) why.push(plural(open, 'pendência aberta', 'pendências abertas'));
+      if (s < 3) why.push('ainda não aprovado (' + STATUS[s] + ')');
+      if (d < t) out.push({ sev: 2, d: d, kind: 'post', id: p.id, label: 'Post', text: dm(p.date) + ' ' + p.title + ': atrasado, não marcado como publicado.' });
+      else if (why.length) out.push({ sev: (open && days <= 2) ? 2 : 1, d: d, kind: 'post', id: p.id, label: 'Post', text: dm(p.date) + ' (' + when + ') ' + p.title + ': ' + why.join(' e ') + '.' });
+    });
+    POSTS.forEach(function (p) { if (st(p.id) >= 3 && st(p.id) < 4 && pendOpen(p) && pd(p.date) >= t && pd(p.date) <= lim) out.push({ sev: 1, d: pd(p.date), kind: 'post', id: p.id, label: 'Post', text: dm(p.date) + ' ' + p.title + ': aprovado com pendência aberta.' }); });
+    STORIES.forEach(function (s) {
+      var d = pd(s.date); if (sst(s.id) === 4 || d > lim) return;
+      var open = depOpen(s.id), days = dayDiff(d, t);
+      if (d < t) { if (days >= -3) out.push({ sev: 1, d: d, kind: 'story', id: s.id, label: 'Story', text: dm(s.date) + ' ' + s.title + ': não marcado como publicado.' }); }
+      else if (open) out.push({ sev: days <= 1 ? 2 : 1, d: d, kind: 'story', id: s.id, label: 'Story', text: dm(s.date) + ' ' + s.title + ': depende de ' + plural(open, 'pendência', 'pendências') + ' do post.' });
+    });
+    var seen = {}; out = out.filter(function (o) { var k = o.kind + o.id + o.text; if (seen[k]) return false; seen[k] = 1; return true; });
+    out.sort(function (a, b) { return b.sev - a.sev || a.d - b.d; });
+    return out;
+  }
+  function allPend() {
+    var rows = [];
+    POSTS.forEach(function (p) { p.pend.forEach(function (t, i) { rows.push({ p: p, i: i, t: t, done: pendDone(p, i), due: pendDue(p, i), owner: pendOwnerOf(p, i) }); }); });
+    return rows;
+  }
+  function openPendTotal() { return allPend().filter(function (r) { return !r.done; }).length; }
+  function backupInfo() {
+    if (remote) return { txt: 'Dados salvos na nuvem, com login. Backup é opcional.', stale: false };
+    if (db) return { txt: 'Dados compartilhados, salvos automaticamente para quem tem acesso.', stale: false };
+    var lb = ''; try { lb = localStorage.getItem(LB_KEY) || ''; } catch (e) {}
+    var has = Object.keys(S).length + Object.keys(SS).length > 0;
+    if (!storageOK) return { txt: 'Este navegador não guarda dados. Baixe um backup depois de cada alteração.', stale: true };
+    if (!lb) return { txt: 'Salvo neste computador. Nenhum backup baixado ainda.', stale: has };
+    var days = dayDiff(today(), new Date(new Date(lb).getFullYear(), new Date(lb).getMonth(), new Date(lb).getDate()));
+    return { txt: 'Salvo neste computador. Último backup: ' + (days === 0 ? 'hoje' : days === 1 ? 'ontem' : 'há ' + days + ' dias') + '.', stale: days >= 7 && has };
+  }
+  function setBackupStatus() { var b = backupInfo(); setText('backup-status', b.txt); }
+
+  /* ---------- Componentes ---------- */
+  function statusSel(act, id, s) {
+    return '<select class="st" data-act="' + act + '" data-id="' + id + '" data-s="' + s + '" aria-label="Status"' + (canWrite ? '' : ' disabled') + '>' +
+      STATUS.map(function (n, i) { return '<option value="' + i + '"' + (i === s ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select>';
+  }
+  function netTags(p) { return p.nets.map(function (n) { return '<span class="net">' + NETS[n] + '</span>'; }).join(''); }
+  function dateBox(s) { var d = pd(s); return '<div class="date"><span class="w">' + DOW[d.getDay()] + '</span><span class="d">' + d.getDate() + '</span><span class="m">' + MON[d.getMonth()] + '</span></div>'; }
+  function dis() { return canWrite ? '' : ' disabled'; }
+
+  function attentionCard(compact) {
+    var items = attention();
+    if (!items.length) return '<div class="panel attn ok"><h2>Atenção</h2><p class="none">Nada em risco nos próximos 7 dias.</p></div>';
+    var list = compact ? items.slice(0, 6) : items;
+    return '<div class="panel attn"><h2>Atenção <span class="count">' + items.length + '</span></h2><ul class="attn-list">' + list.map(function (it) {
+      return '<li><span class="pill ' + (it.sev === 2 ? 'bad' : 'warn') + '">' + (it.sev === 2 ? 'Urgente' : 'Atenção') + '</span><span class="txt"><b>' + it.label + '</b> ' + esc(it.text) + '</span><button class="btn" data-act="open-' + it.kind + '" data-id="' + it.id + '">Abrir</button></li>';
+    }).join('') + '</ul>' + (compact && items.length > 6 ? '<p class="none">Mais ' + (items.length - 6) + ' itens. Veja a lista completa na aba Pendências e no Relatório.</p>' : '') + '</div>';
+  }
+
+  function postCard(p) {
+    var open = openId === p.id, d = doc(p.id), left = pendOpen(p), isToday = p.date === iso(today());
+    var h = '<article class="post' + (isToday ? ' today' : '') + '" id="post-' + p.id + '"><div class="row">' + dateBox(p.date) +
+      '<div class="main"><h3>' + esc(p.title) + '</h3><div class="meta"><span>' + esc(p.format) + '</span>' + netTags(p) + '<span class="tag">' + esc(p.aud) + '</span>' +
+      (d.time ? '<span class="tag">' + esc(d.time) + '</span>' : '') + (d.owner ? '<span class="tag">' + esc(d.owner) + '</span>' : '') + '</div></div>' +
+      '<div class="side">' + (p.pend.length ? '<span class="pill ' + (left ? 'warn' : 'good') + '">' + (left ? plural(left, 'pendência', 'pendências') : 'Sem pendências') + '</span>' : '') +
+      statusSel('status', p.id, st(p.id)) + '<button class="btn" data-act="toggle" data-id="' + p.id + '" aria-expanded="' + open + '">' + (open ? 'Fechar' : 'Detalhes') + '</button></div></div>';
+    if (open) {
+      h += '<div class="detail"><div><h4>Descritivo</h4><p>' + esc(p.summary) + '</p></div>' +
+        '<div><h4>Uso do ET</h4><p>' + esc(p.et) + '</p>' + (p.caption ? '<h4 style="margin-top:10px">Legenda</h4><p>' + esc(p.caption) + '</p>' : '') + '</div>' +
+        '<div><h4>Pendências</h4>' + (p.pend.length ? '<ul class="checks">' + p.pend.map(function (t, i) {
+          var ok = pendDone(p, i);
+          return '<li class="' + (ok ? 'done' : '') + '"><label><input type="checkbox" data-act="pend" data-id="' + p.id + '" data-i="' + i + '"' + (ok ? ' checked' : '') + dis() + '><span>' + esc(t) + '</span></label></li>';
+        }).join('') + '</ul><p class="none">Responsável e prazo ficam na aba Pendências.</p>' : '<p class="none">Nenhuma pendência para este post.</p>') + '</div>' +
+        '<div><h4>Gestão</h4>' +
+        '<label class="f">Responsável<input type="text" list="owners" data-act="p-owner" data-id="' + p.id + '" value="' + esc(d.owner || '') + '"' + dis() + '></label>' +
+        '<label class="f">Horário de publicação<input type="time" data-act="p-time" data-id="' + p.id + '" value="' + esc(d.time || '') + '"' + dis() + '></label>' +
+        '<label class="f">Aprovado por<input type="text" data-act="p-appby" data-id="' + p.id + '" value="' + esc(d.approvedBy || '') + '"' + dis() + '></label>' +
+        (d.approvedAt ? '<p class="none">Aprovado em ' + dm(d.approvedAt) + '.</p>' : '') +
+        '<label class="f">Observações<textarea rows="2" data-act="p-note" data-id="' + p.id + '"' + dis() + '>' + esc(d.note || '') + '</textarea></label></div>' +
+        '<div><h4>Arquivos no Drive</h4><p>' + esc(p.files) + '</p><p>' + (d.inDrive ? 'Anexado no Drive.' : 'Ainda não anexado.') + '</p></div></div>';
+    }
+    return h + '</article>';
+  }
+
+  function storyScreens(s) {
+    var lines = s.script.split(/\s+(?=\d+\.\s)/).filter(Boolean);
+    if (!/^1\./.test(lines[0])) lines = [s.script];
+    return lines.map(function (line, i) {
+      return '<div class="story-screen"><div class="story-screen-head"><b>Tela ' + (i + 1) + '</b><span>Vertical 9:16</span></div><p>' + esc(line.replace(/^\d+\.\s*/, '')) + '</p></div>';
+    }).join('');
+  }
+  function storyCard(s, force) {
+    var x = sdoc(s.id), status = sst(s.id), open = force || storyOpen === s.id, isToday = s.date === iso(today()), dep = depOpen(s.id);
+    var h = '<article class="post' + (isToday ? ' today' : '') + '" id="story-' + s.id + '"><div class="row">' + dateBox(s.date) +
+      '<div class="main"><h3>' + esc(s.title) + '</h3><div class="meta"><span>Semana ' + s.week + '</span><span class="net">Instagram</span><span class="net">Facebook</span></div></div>' +
+      '<div class="side">' + (dep ? '<span class="pill warn">Depende de ' + plural(dep, 'pendência', 'pendências') + '</span>' : '') + statusSel('story-status', s.id, status) +
+      (force ? '' : '<button class="btn" data-act="story-toggle" data-id="' + s.id + '" aria-expanded="' + open + '">' + (open ? 'Fechar' : 'Detalhes') + '</button>') + '</div></div>';
+    if (open) {
+      var linked = (CYCLE.storyPost[s.id] || []).map(byId).filter(Boolean)[0];
+      h += '<div class="detail"><div><h4>Roteiro tela a tela</h4><div class="story-screens">' + storyScreens(s) + '</div><h4 style="margin-top:12px">Orientação criativa</h4><p>' + esc(CYCLE.guidance[s.id.slice(1)] || 'Mantenha o conteúdo alinhado ao objetivo do dia.') + '</p></div>' +
+        '<div><h4>Figurinhas interativas</h4><p>' + esc(s.sticker) + '</p><h4 style="margin-top:10px">ET</h4><p>' + esc(s.et) + '</p>' +
+        (linked ? '<h4 style="margin-top:10px">Post relacionado</h4><p>' + dm(linked.date) + ' · ' + esc(linked.title) + '</p>' : '') +
+        (dep ? '<div class="warnbox">Este story depende de dados do post. Ainda há ' + plural(dep, 'pendência aberta', 'pendências abertas') + '. Só publique com tudo confirmado.</div>' : '') + '</div>' +
+        '<div><h4>Produção</h4><ul class="checks">' + [['script', 'Roteiro revisado'], ['art', 'Arte ou vídeo pronto'], ['approved', 'Aprovado'], ['published', 'Publicado no Instagram e no Facebook']].map(function (z) {
+          return '<li><label><input type="checkbox" data-act="story-check" data-id="' + s.id + '" data-k="' + z[0] + '"' + (x[z[0]] ? ' checked' : '') + dis() + '><span>' + z[1] + '</span></label></li>';
+        }).join('') + '</ul></div>' +
+        '<div><h4>Resultados do dia</h4><div class="fields">' + [['views', 'Visualizações'], ['replies', 'Respostas e votos'], ['links', 'Cliques no link'], ['exits', 'Saídas'], ['forward', 'Avanços'], ['back', 'Voltas']].map(function (z) {
+          return '<label class="f">' + z[1] + '<input type="number" min="0" data-live="1" data-act="story-metric" data-id="' + s.id + '" data-k="' + z[0] + '" value="' + (x[z[0]] != null ? esc(x[z[0]]) : '') + '"' + dis() + '></label>';
+        }).join('') + '</div><p class="none">Retenção: <b id="ret-' + s.id + '">' + retention(x) + '</b> (visualizações menos saídas)</p>' +
+        '<label class="f" style="margin-top:6px">Observações<input type="text" data-act="story-note" data-id="' + s.id + '" value="' + esc(x.note || '') + '" placeholder="Ex.: aguardando aprovação"' + dis() + '></label></div></div>';
+    }
+    return h + '</article>';
+  }
+
+  /* ---------- Páginas ---------- */
+  function renderHoje() {
+    var t = today(), ds = iso(t), post = POSTS.filter(function (p) { return p.date === ds; })[0], story = STORIES.filter(function (s) { return s.date === ds; })[0];
+    var start = pd(CYCLE.start), end = pd(CYCLE.end), total = dayDiff(end, start) + 1, n = dayDiff(t, start) + 1;
+    var pos = t < start ? 'O ' + CYCLE.name + ' começa em ' + plural(dayDiff(start, t), 'dia', 'dias') + '.' : t > end ? CYCLE.name + ' encerrado. Hora da reunião de feedback.' : 'Dia ' + n + ' de ' + total + ' do ' + CYCLE.name + '.';
+    var pubPosts = POSTS.filter(function (p) { return st(p.id) === 4; }).length, pubStories = STORIES.filter(function (s) { return sst(s.id) === 4; }).length;
+    var fb = META.feedback.date, fbTxt = fb ? (function () { var dd = dayDiff(pd(fb), t); return dd > 0 ? 'Reunião de feedback em ' + plural(dd, 'dia', 'dias') + ' (' + dm(fb) + ')' : dd === 0 ? 'Reunião de feedback é hoje' : 'Reunião de feedback foi em ' + dm(fb); })() : 'Reunião de feedback: data a definir (depois de ' + dm(CYCLE.end) + ')';
+    var bi = backupInfo();
+    var nextPosts = POSTS.filter(function (p) { return p.date > ds && st(p.id) < 4; }).slice(0, 3);
+    var h = '<div class="col"><div class="next"><div><small>' + DOWL[t.getDay()] + ', ' + dm(ds) + '</small><br><strong>' + pos + '</strong></div><span>' + fbTxt + '</span><button class="btn-link" data-act="tab" data-v="programacao">Ver programação</button></div>';
+    if (!db && !remote && bi.stale) h += '<div class="notice">Faça um backup: há alterações que existem só neste computador. Abra "Ferramentas e backup" no fim da página.</div>';
+    h += '<div class="kpis"><div class="kpi"><b>' + pubPosts + ' de ' + POSTS.length + '</b><span>Posts publicados</span></div><div class="kpi"><b>' + pubStories + ' de ' + STORIES.length + '</b><span>Dias de stories publicados</span></div>' +
+      '<div class="kpi"><b>' + openPendTotal() + '</b><span>Pendências abertas</span></div><div class="kpi"><b>' + attention().length + '</b><span>Itens em atenção nos próximos 7 dias</span></div></div>';
+    h += attentionCard(true);
+    h += '<div class="week"><h2>Hoje</h2>' + (post ? postCard(post) : '<div class="empty">Sem post de feed hoje.' + (nextPosts[0] ? ' Próximo: ' + dm(nextPosts[0].date) + ' · ' + esc(nextPosts[0].title) + '.' : '') + '</div>') +
+      (story ? storyCard(story, true) : '<div class="empty">Sem stories planejados para hoje.</div>') + '</div>';
+    if (nextPosts.length) {
+      h += '<div class="panel"><h2>Próximos posts</h2><div class="scroll"><table><thead><tr><th>Data</th><th>Post</th><th>Status</th><th>Pendências</th><th></th></tr></thead><tbody>' + nextPosts.map(function (p) {
+        var o = pendOpen(p); return '<tr><td class="tnum">' + dm(p.date) + ' (' + DOW[pd(p.date).getDay()] + ')</td><td>' + esc(p.title) + '</td><td><span class="pill" data-s="' + st(p.id) + '">' + STATUS[st(p.id)] + '</span></td><td>' + (o ? '<span class="pill warn">' + plural(o, 'aberta', 'abertas') + '</span>' : '<span class="pill good">Nenhuma</span>') + '</td><td class="num"><button class="btn" data-act="open-post" data-id="' + p.id + '">Abrir</button></td></tr>';
+      }).join('') + '</tbody></table></div></div>';
+    }
+    $('p-hoje').innerHTML = h + '</div>';
+  }
+
+  function renderQuadro() {
+    var counts = STATUS.map(function (_, i) { return POSTS.filter(function (p) { return st(p.id) === i; }).length; });
+    var h = '<div class="col"><div class="strip">' + STATUS.map(function (n, i) {
+      return '<button class="stat" data-act="fstatus" data-i="' + i + '" aria-pressed="' + (fStatus === i) + '"><b>' + counts[i] + '</b><span class="pill" data-s="' + i + '">' + n + '</span></button>';
+    }).join('') + '</div>' + attentionCard(true);
+    var t = today(), nxt = POSTS.filter(function (p) { return pd(p.date) >= t && st(p.id) < 4; })[0];
+    if (nxt) {
+      var d = pd(nxt.date), days = dayDiff(d, t), tm = doc(nxt.id).time;
+      h += '<div class="next"><div><small>Próximo post</small><br><strong>' + dm(nxt.date) + ' (' + DOW[d.getDay()] + '): ' + esc(nxt.title) + '</strong></div><span>' + (days === 0 ? 'Hoje' : days === 1 ? 'Amanhã' : 'Em ' + days + ' dias') + (tm ? ' às ' + esc(tm) : '') + ' · ' + esc(nxt.format) + '</span><button class="btn-link" data-act="open-post" data-id="' + nxt.id + '">Ver detalhes</button></div>';
+    } else h += '<div class="next"><div><small>' + esc(CYCLE.name) + '</small><br><strong>Todos os posts publicados ou fora do prazo</strong></div><span>Próximo passo: reunião de feedback</span></div>';
+    h += '<div class="filters" role="group" aria-label="Filtrar por semana"><button class="chip" data-act="fweek" data-i="0" aria-pressed="' + (fWeek === 0) + '">Todas as semanas</button>' +
+      [1, 2, 3, 4].map(function (w) { return '<button class="chip" data-act="fweek" data-i="' + w + '" aria-pressed="' + (fWeek === w) + '">Semana ' + w + '</button>'; }).join('') +
+      (fStatus >= 0 ? '<button class="chip" data-act="fstatus" data-i="' + fStatus + '" aria-pressed="false">Limpar filtro: ' + STATUS[fStatus] + ' ×</button>' : '') + '</div>';
+    var any = false;
+    [1, 2, 3, 4].forEach(function (w) {
+      if (fWeek && fWeek !== w) return;
+      var list = POSTS.filter(function (p) { return p.week === w && (fStatus < 0 || st(p.id) === fStatus); });
+      if (!list.length) return; any = true;
+      h += '<div class="week"><h2>Semana ' + w + ' <small>' + CYCLE.weeks[w] + ' · segunda, quarta e sexta</small></h2>' + list.map(postCard).join('') + '</div>';
+    });
+    if (!any) h += '<div class="empty">Nenhum post com esses filtros.</div>';
+    $('p-quadro').innerHTML = h + '</div>';
+  }
+
+  function renderStories() {
+    var pub = STORIES.filter(function (s) { return sst(s.id) === 4; }).length, g = storyAgg(0);
+    var h = '<div class="col"><div class="kpis"><div class="kpi"><b>' + pub + ' de ' + STORIES.length + '</b><span>Dias de stories publicados</span></div>' +
+      '<div class="kpi"><b>' + (STORIES.length - pub) + '</b><span>Dias aguardando publicação</span></div><div class="kpi"><b>2 a 4</b><span>Telas por dia · Instagram e Facebook</span></div>' +
+      '<div class="kpi"><b>' + (g.views ? pct(Math.max(g.views - g.exits, 0), g.views) : '-') + '</b><span>Retenção média (onde há resultado)</span></div></div>' +
+      '<div class="filters" role="group" aria-label="Filtrar por semana">' + [0, 1, 2, 3, 4].map(function (w) { return '<button class="chip" aria-pressed="' + (storyWeek === w) + '" data-act="story-week" data-i="' + w + '">' + (w ? 'Semana ' + w : 'Todas as semanas') + '</button>'; }).join('') + '</div>';
+    [1, 2, 3, 4].forEach(function (w) {
+      if (storyWeek && storyWeek !== w) return;
+      var list = STORIES.filter(function (s) { return s.week === w; }); if (!list.length) return;
+      h += '<div class="week"><h2>Semana ' + w + ' <small>' + CYCLE.weeks[w] + '</small></h2>' + list.map(function (s) { return storyCard(s, false); }).join('') + '</div>';
+    });
+    h += '<div class="panel"><h2>Orientações de produção</h2><ul>' + CYCLE.storyRules.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></div></div>';
+    $('p-stories').innerHTML = h;
+  }
+
+  function renderPend() {
+    var rows = allPend(), t = iso(today()), ow = owners();
+    var open = rows.filter(function (r) { return !r.done; }), late = open.filter(function (r) { return r.due < t; });
+    var list = rows.filter(function (r) {
+      if (pFilter === 'abertas' && r.done) return false;
+      if (pFilter === 'atrasadas' && (r.done || r.due >= t)) return false;
+      if (pOwner === '__none' && r.owner) return false;
+      if (pOwner && pOwner !== '__none' && r.owner !== pOwner) return false;
+      return true;
+    }).sort(function (a, b) { return (a.done - b.done) || (a.due < b.due ? -1 : a.due > b.due ? 1 : 0) || (a.p.date < b.p.date ? -1 : 1); });
+    var h = '<div class="col"><div class="kpis"><div class="kpi"><b>' + open.length + '</b><span>Pendências abertas</span></div><div class="kpi"><b>' + late.length + '</b><span>Com prazo vencido</span></div>' +
+      '<div class="kpi"><b>' + (rows.length - open.length) + ' de ' + rows.length + '</b><span>Concluídas</span></div><div class="kpi"><b>' + open.filter(function (r) { return !r.owner; }).length + '</b><span>Sem responsável</span></div></div>' +
+      '<div class="panel"><div class="filters">' + [['abertas', 'Abertas'], ['atrasadas', 'Atrasadas'], ['todas', 'Todas']].map(function (f) { return '<button class="chip" data-act="pfilter" data-v="' + f[0] + '" aria-pressed="' + (pFilter === f[0]) + '">' + f[1] + '</button>'; }).join('') +
+      '<label class="f" style="flex-direction:row;align-items:center;gap:8px;margin-left:auto">Responsável <select class="plain" data-act="powner" style="width:auto"><option value="">Todos</option><option value="__none"' + (pOwner === '__none' ? ' selected' : '') + '>Sem responsável</option>' +
+      ow.map(function (o) { return '<option' + (pOwner === o ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select></label></div>' +
+      '<p class="none">Prazo sugerido: 2 dias antes da publicação do post. Altere para o prazo combinado com a equipe.</p>';
+    if (!list.length) h += '<div class="empty">Nenhuma pendência com esses filtros.</div>';
+    else h += '<div><div class="prow head"><span></span><span>Pendência</span><span>Responsável</span><span>Prazo</span><span>Situação</span></div>' + list.map(function (r) {
+      var overdue = !r.done && r.due < t;
+      return '<div class="prow' + (r.done ? ' done' : '') + '"><input type="checkbox" data-act="pend" data-id="' + r.p.id + '" data-i="' + r.i + '"' + (r.done ? ' checked' : '') + dis() + ' aria-label="Concluir pendência">' +
+        '<div><span class="ttl">' + esc(r.t) + '</span><small>' + dm(r.p.date) + ' · ' + esc(r.p.title) + '</small></div>' +
+        '<input type="text" list="owners" placeholder="Responsável" data-act="pend-owner" data-id="' + r.p.id + '" data-i="' + r.i + '" value="' + esc(r.owner) + '"' + dis() + ' aria-label="Responsável">' +
+        '<input type="date" data-act="pend-due" data-id="' + r.p.id + '" data-i="' + r.i + '" value="' + esc(r.due) + '"' + dis() + ' aria-label="Prazo">' +
+        '<span class="pill ' + (r.done ? 'good' : overdue ? 'bad' : 'warn') + '">' + (r.done ? 'Concluída' : overdue ? 'Atrasada' : 'Aberta') + '</span></div>';
+    }).join('') + '</div>';
+    $('p-pendencias').innerHTML = h + '<datalist id="owners">' + ow.map(function (o) { return '<option value="' + esc(o) + '">'; }).join('') + '</datalist></div></div>';
+  }
+
+  function calendar(y, m) {
+    var first = new Date(y, m, 1), off = (first.getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate(), t = today(), fb = META.feedback.date;
+    var h = '<div class="scroll"><div class="cal" role="grid">' + ['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'].map(function (d) { return '<div class="h">' + d + '</div>'; }).join('');
+    for (var i = 0; i < off; i++) h += '<div class="c off"></div>';
+    for (var d = 1; d <= days; d++) {
+      var dt = new Date(y, m, d), ds = iso(dt), ps = POSTS.filter(function (p) { return p.date === ds; }), ss = STORIES.filter(function (s) { return s.date === ds; });
+      h += '<div class="c' + (ds === iso(t) ? ' today' : '') + '"><span class="n">' + d + '</span>' + ps.map(function (p) {
+        return '<button class="e" data-act="open-post" data-id="' + p.id + '" data-s="' + st(p.id) + '" title="' + esc(p.title) + '">' + esc(p.title.length > 34 ? p.title.slice(0, 32) + '…' : p.title) + '</button>';
+      }).join('') + ss.map(function (s) { return '<button class="sd" data-act="open-story" data-id="' + s.id + '" data-s="' + sst(s.id) + '" title="Stories: ' + esc(s.title) + '"><i></i>Stories</button>'; }).join('') +
+        (fb === ds ? '<span class="fb">Feedback</span>' : '') + '</div>';
+    }
+    return h + '</div></div>';
+  }
+  function renderProg() {
+    var pill = {}; POSTS.forEach(function (p) { pill[p.pillar] = (pill[p.pillar] || 0) + 1; });
+    var max = Math.max.apply(null, Object.keys(pill).map(function (k) { return pill[k]; }));
+    var months = [], s = pd(CYCLE.start), e = pd(CYCLE.end), fb = META.feedback.date ? pd(META.feedback.date) : null;
+    var last = fb && fb > e ? fb : e;
+    for (var y = s.getFullYear(), m = s.getMonth(); y < last.getFullYear() || (y === last.getFullYear() && m <= last.getMonth()); m++) { if (m > 11) { m = 0; y++; } months.push([y, m]); if (months.length > 6) break; }
+    var h = '<div class="col"><div class="cols">' + months.slice(0, 2).map(function (ym) {
+      var key = ym[0] + '-' + String(ym[1] + 1).padStart(2, '0'), n = POSTS.filter(function (p) { return p.date.slice(0, 7) === key; }).length;
+      return '<div class="panel"><h2>' + MONL[ym[1]].charAt(0).toUpperCase() + MONL[ym[1]].slice(1) + ' de ' + ym[0] + '</h2><p class="tnum"><b>' + plural(n, 'post', 'posts') + '</b></p><p>' + esc(CYCLE.months[key] || '') + '</p></div>';
+    }).join('') + '</div>';
+    h += '<div class="panel"><h2>Como funciona a rotina</h2><ul>' + CYCLE.routine.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></div>';
+    h += '<div class="panel"><h2>Reunião de feedback</h2><div class="cols"><div class="col"><label class="f">Data da reunião<input type="date" data-act="fb-date" value="' + esc(META.feedback.date) + '"' + dis() + '></label>' +
+      '<p class="none">' + (META.feedback.date ? (function () { var dd = dayDiff(pd(META.feedback.date), today()); return dd > 0 ? 'Faltam ' + plural(dd, 'dia', 'dias') + '.' : dd === 0 ? 'A reunião é hoje.' : 'A reunião já aconteceu.'; })() : 'Defina a data para ela aparecer no calendário e na página Hoje.') + '</p></div>' +
+      '<div><h4>Preparação</h4><ul class="checks">' + CYCLE.feedbackChecklist.map(function (c, i) { var ok = (META.feedback.checks || {})[i]; return '<li class="' + (ok ? 'done' : '') + '"><label><input type="checkbox" data-act="fb-check" data-i="' + i + '"' + (ok ? ' checked' : '') + dis() + '><span>' + esc(c) + '</span></label></li>'; }).join('') + '</ul></div></div></div>';
+    h += '<div class="panel"><h2>Calendário</h2><div class="legend">' + STATUS.map(function (n, i) { return '<span class="pill" data-s="' + i + '">' + n + '</span>'; }).join('') + '<span class="none">Os pontos marcam os dias de stories.</span></div>' +
+      months.map(function (ym) { return '<h3>' + MONL[ym[1]].charAt(0).toUpperCase() + MONL[ym[1]].slice(1) + ' ' + ym[0] + '</h3>' + calendar(ym[0], ym[1]); }).join('') + '</div>';
+    h += '<div class="panel"><h2>Posts por pilar de conteúdo</h2><div class="bars">' + Object.keys(pill).map(function (k) {
+      return '<div class="bar"><span>' + esc(k) + '</span><i style="width:' + (pill[k] / max * 100) + '%"></i><b class="tnum">' + pill[k] + '</b></div>';
+    }).join('') + '</div></div></div>';
+    $('p-programacao').innerHTML = h;
+  }
+
+  function goalRow(g, a) {
+    var gd = (META.goals || {})[g.key] || {}, meta = gd.meta, res = g.auto === 'views' ? a.tv : g.auto === 'rate' ? (a.tv ? a.ti / a.tv * 100 : 0) : gd.res;
+    var p = meta && res != null ? Math.min(res / meta * 100, 100) : 0;
+    return '<div class="goal"><b>' + esc(g.label) + (g.auto ? ' <span class="none">(automático)</span>' : '') + '</b>' +
+      '<label class="f">Meta<input type="number" min="0" step="any" data-live="1" data-act="goal-meta" data-k="' + g.key + '" value="' + (meta != null ? esc(meta) : '') + '"' + dis() + '></label>' +
+      (g.auto ? '<div><span class="none">Resultado</span><br><b class="tnum" id="gres-' + g.key + '">' + (g.auto === 'rate' ? res.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%' : fmt(res)) + '</b></div>' :
+        '<label class="f">Resultado<input type="number" min="0" step="any" data-live="1" data-act="goal-res" data-k="' + g.key + '" value="' + (res != null ? esc(res) : '') + '"' + dis() + '></label>') +
+      '<div class="prog" role="img" aria-label="Progresso da meta"><i id="gbar-' + g.key + '" style="width:' + p + '%"></i></div><span class="tnum" id="gpct-' + g.key + '">' + (meta ? Math.round(res / meta * 100) + '%' : 'sem meta') + '</span></div>';
+  }
+  function groupTable(title, rows) {
+    return '<div><h4>' + title + '</h4><div class="scroll"><table><thead><tr><th>Grupo</th><th class="num">Posts</th><th class="num">Alcance</th><th class="num">Interações</th><th class="num">Taxa</th></tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr><td>' + esc(r.k) + '</td><td class="num">' + r.n + '</td><td class="num">' + fmt(r.v) + '</td><td class="num">' + fmt(r.i) + '</td><td class="num">' + (r.n ? pct(r.i, r.v) : '-') + '</td></tr>'; }).join('') + '</tbody></table></div></div>';
+  }
+  function renderEng() {
+    var a = engAgg(), pub = POSTS.filter(function (p) { return st(p.id) === 4; }).length, has = a.tv + a.ti + a.tc > 0, withData = a.rows.filter(function (r) { return r.has && r.v > 0; });
+    var h = '<div class="col"><div class="kpis"><div class="kpi"><b>' + pub + ' de ' + POSTS.length + '</b><span>Posts publicados</span></div><div class="kpi"><b id="k-views">' + fmt(a.tv) + '</b><span>Alcance total</span></div>' +
+      '<div class="kpi"><b id="k-inter">' + fmt(a.ti) + '</b><span>Interações (curtidas, comentários, compartilhamentos e salvos)</span></div><div class="kpi"><b id="k-rate">' + pct(a.ti, a.tv) + '</b><span>Taxa de engajamento sobre o alcance</span></div>' +
+      '<div class="kpi"><b id="k-clicks">' + fmt(a.tc) + '</b><span>Cliques no link</span></div></div>';
+    h += '<div class="panel"><h2>Metas e resultados do ciclo</h2><p class="none">Defina as metas antes da reunião de feedback. Alcance e taxa são calculados pelos posts. Os demais você informa.</p>' + CYCLE.goals.map(function (g) { return goalRow(g, a); }).join('') + '</div>';
+    if (!has) h += '<div class="empty">Ainda não há números. Depois que cada post for publicado, clique em "Registrar" na tabela abaixo ou cole as métricas de uma planilha.</div>';
+    else {
+      var mx = Math.max.apply(null, a.rows.map(function (r) { return r.i; })) || 1;
+      h += '<div class="panel"><h2>Interações por post</h2><div class="key"><span style="--k:var(--c-ig)">Instagram</span><span style="--k:var(--c-fb)">Facebook</span><span style="--k:var(--c-tt)">TikTok</span></div><div class="chart">' + a.rows.map(function (r) {
+        return '<div class="crow"><span class="t">' + dm(r.p.date) + ' ' + esc(r.p.title) + '</span><div class="track" role="img" aria-label="' + r.i + ' interações">' +
+          ['ig', 'fb', 'tt'].map(function (n) { return r.seg[n] ? '<i data-n="' + n + '" style="width:' + (r.seg[n] / mx * 100) + '%" title="' + NETS[n] + ': ' + fmt(r.seg[n]) + '"></i>' : ''; }).join('') + '</div><b class="tnum" style="text-align:right">' + fmt(r.i) + '</b></div>';
+      }).join('') + '</div></div>';
+      var ranked = withData.slice().sort(function (x, y) { return (y.i / y.v) - (x.i / x.v); });
+      h += '<div class="panel"><h2>O que funcionou melhor</h2><div class="cols"><div><h4>Melhores taxas de engajamento</h4><ul class="rank">' + ranked.slice(0, 3).map(function (r) { return '<li><span>' + dm(r.p.date) + ' ' + esc(r.p.title) + '</span><b class="tnum">' + pct(r.i, r.v) + '</b></li>'; }).join('') + '</ul></div>' +
+        '<div><h4>Menores taxas</h4><ul class="rank">' + (ranked.length > 3 ? ranked.slice(-3).reverse().map(function (r) { return '<li><span>' + dm(r.p.date) + ' ' + esc(r.p.title) + '</span><b class="tnum">' + pct(r.i, r.v) + '</b></li>'; }).join('') : '<li class="none">Aparecem quando houver mais de 3 posts com números.</li>') + '</ul></div></div></div>';
+      h += '<div class="panel"><h2>Comparativos para decidir o Ciclo 2</h2><div class="cols">' + groupTable('Por pilar', groupBy(a.rows, function (p) { return p.pillar; })) + groupTable('Por formato', groupBy(a.rows, fmtGroup)) + groupTable('Por público', groupBy(a.rows, function (p) { return p.aud; })) +
+        '<div><h4>Por rede</h4><div class="scroll"><table><thead><tr><th>Rede</th><th class="num">Alcance</th><th class="num">Interações</th><th class="num">Cliques</th><th class="num">Taxa</th></tr></thead><tbody>' +
+        ['ig', 'fb', 'tt'].map(function (n) { return '<tr><td>' + NETS[n] + '</td><td class="num" id="nv-' + n + '">' + fmt(a.byNet[n].v) + '</td><td class="num" id="ni-' + n + '">' + fmt(a.byNet[n].i) + '</td><td class="num" id="nc-' + n + '">' + fmt(a.byNet[n].c) + '</td><td class="num" id="nr-' + n + '">' + pct(a.byNet[n].i, a.byNet[n].v) + '</td></tr>'; }).join('') + '</tbody></table></div></div></div></div>';
+    }
+    var sg = storyAgg(0);
+    h += '<div class="panel"><h2>Resultado dos stories</h2><div class="scroll"><table><thead><tr><th>Semana</th><th class="num">Dias com dados</th><th class="num">Visualizações</th><th class="num">Retenção</th><th class="num">Respostas e votos</th><th class="num">Cliques no link</th></tr></thead><tbody>' +
+      [1, 2, 3, 4].map(function (w) { var x = storyAgg(w); return '<tr><td>Semana ' + w + ' <span class="none">' + CYCLE.weeks[w] + '</span></td><td class="num">' + x.days + '</td><td class="num">' + fmt(x.views) + '</td><td class="num">' + (x.views ? pct(Math.max(x.views - x.exits, 0), x.views) : '-') + '</td><td class="num">' + fmt(x.replies) + '</td><td class="num">' + fmt(x.links) + '</td></tr>'; }).join('') +
+      '<tr><td><b>Total</b></td><td class="num">' + sg.days + '</td><td class="num">' + fmt(sg.views) + '</td><td class="num">' + (sg.views ? pct(Math.max(sg.views - sg.exits, 0), sg.views) : '-') + '</td><td class="num">' + fmt(sg.replies) + '</td><td class="num">' + fmt(sg.links) + '</td></tr></tbody></table></div><p class="none">Os números de cada dia são registrados na aba Stories, dentro dos detalhes.</p></div>';
+    h += '<div class="panel"><h2>Colar métricas de uma planilha</h2><p class="none">Uma linha por rede, separada por tabulação ou ponto e vírgula: data (dd/mm), rede (Instagram, Facebook ou TikTok), alcance, interações, cliques (opcional). Exemplo: 19/10;Instagram;1200;85;12</p>' +
+      '<textarea id="paste-metrics" rows="4" data-live="1" data-act="paste-text" placeholder="19/10;Instagram;1200;85;12"' + dis() + '>' + esc(pasteText) + '</textarea><div class="linkbox"><button class="btn" data-act="paste-apply"' + dis() + '>Aplicar métricas</button></div><p class="none" id="paste-result"></p></div>';
+    h += '<div class="panel"><h2>Métricas por post</h2><div class="scroll"><table><thead><tr><th>Post</th><th>Status</th><th class="num">Alcance</th><th class="num">Interações</th><th class="num">Cliques</th><th class="num">Taxa</th><th></th></tr></thead><tbody>' +
+      a.rows.map(function (r) {
+        var s = st(r.p.id), row = '<tr><td><b class="tnum">' + dm(r.p.date) + '</b> ' + esc(r.p.title) + '</td><td><span class="pill" data-s="' + s + '">' + STATUS[s] + '</span></td><td class="num" id="rv-' + r.p.id + '">' + fmt(r.v) + '</td><td class="num" id="ri-' + r.p.id + '">' + fmt(r.i) + '</td><td class="num" id="rc-' + r.p.id + '">' + fmt(r.c) + '</td><td class="num" id="rr-' + r.p.id + '">' + pct(r.i, r.v) + '</td><td class="num"><button class="btn" data-act="edit" data-id="' + r.p.id + '"' + dis() + '>' + (editId === r.p.id ? 'Fechar' : 'Registrar') + '</button></td></tr>';
+        if (editId === r.p.id) {
+          row += '<tr><td colspan="7"><div class="editor"><div class="grid">' + r.p.nets.map(function (n) {
+            var m = (doc(r.p.id).m || {})[n] || {};
+            return '<fieldset><legend>' + NETS[n] + '</legend><div class="fields three">' + [['views', 'Alcance', m.views], ['inter', 'Interações', inter(r.p.id, n) || ''], ['clicks', 'Cliques', m.clicks]].map(function (k) {
+              return '<label class="f">' + k[1] + '<input type="number" min="0" inputmode="numeric" data-live="1" data-act="metric" data-id="' + r.p.id + '" data-n="' + n + '" data-k="' + k[0] + '" value="' + (k[2] != null && k[2] !== '' ? esc(k[2]) : '') + '"></label>';
+            }).join('') + '</div></fieldset>';
+          }).join('') + '</div><div><button class="btn primary" data-act="edit" data-id="' + r.p.id + '">Concluir</button></div></div></td></tr>';
+        }
+        return row;
+      }).join('') + '</tbody></table></div></div></div>';
+    $('p-engajamento').innerHTML = h;
+  }
+  function softEng() {
+    var a = engAgg();
+    setText('k-views', fmt(a.tv)); setText('k-inter', fmt(a.ti)); setText('k-rate', pct(a.ti, a.tv)); setText('k-clicks', fmt(a.tc));
+    a.rows.forEach(function (r) { setText('rv-' + r.p.id, fmt(r.v)); setText('ri-' + r.p.id, fmt(r.i)); setText('rc-' + r.p.id, fmt(r.c)); setText('rr-' + r.p.id, pct(r.i, r.v)); });
+    ['ig', 'fb', 'tt'].forEach(function (n) { setText('nv-' + n, fmt(a.byNet[n].v)); setText('ni-' + n, fmt(a.byNet[n].i)); setText('nc-' + n, fmt(a.byNet[n].c)); setText('nr-' + n, pct(a.byNet[n].i, a.byNet[n].v)); });
+    CYCLE.goals.forEach(function (g) {
+      var gd = (META.goals || {})[g.key] || {}, res = g.auto === 'views' ? a.tv : g.auto === 'rate' ? (a.tv ? a.ti / a.tv * 100 : 0) : gd.res;
+      if (g.auto) setText('gres-' + g.key, g.auto === 'rate' ? res.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%' : fmt(res));
+      var p = gd.meta && res != null ? Math.min(res / gd.meta * 100, 100) : 0, bar = $('gbar-' + g.key); if (bar) bar.style.width = p + '%';
+      setText('gpct-' + g.key, gd.meta ? Math.round((res || 0) / gd.meta * 100) + '%' : 'sem meta');
+    });
+  }
+
+  function renderDrive() {
+    var url = META.drive.url || '', ok = /^https:\/\//.test(url), n = POSTS.filter(function (p) { return doc(p.id).inDrive; }).length;
+    var h = '<div class="col"><div class="panel"><h2>Pasta do Drive com todos os posts</h2><p>Todos os arquivos finais ficam anexados nesta pasta: vídeos, slides, capas e legendas, separados por data de publicação.</p>' +
+      '<div class="linkbox"><input type="url" id="drive-url" placeholder="Cole aqui o link da pasta do Google Drive" value="' + esc(url) + '" aria-label="Link da pasta do Drive"' + dis() + '><button class="btn primary" data-act="drive-save"' + dis() + '>Salvar link</button></div>' +
+      (ok ? '<div class="linkbox"><a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">Abrir pasta no Drive</a><button class="btn" data-act="copy">Copiar link</button></div><p class="none" style="overflow-wrap:anywhere">' + esc(url) + '</p>' : '<p class="none">Nenhum link salvo. Quando a pasta estiver criada, cole o endereço acima.</p>') + '</div>' +
+      '<div class="panel"><h2>Arquivos por post</h2><p class="tnum">' + n + ' de ' + POSTS.length + ' posts com arquivos anexados.</p><div>' + POSTS.map(function (p) {
+        var d = doc(p.id);
+        return '<div class="frow"><div><b class="tnum">' + dm(p.date) + '</b> ' + esc(p.title) + '<small>' + esc(p.files) + '</small></div><input type="url" data-act="plink" data-id="' + p.id + '" placeholder="Link do arquivo (opcional)" value="' + esc(d.link || '') + '" aria-label="Link do arquivo de ' + esc(p.title) + '"' + dis() + '><label class="chk"><input type="checkbox" data-act="indrive" data-id="' + p.id + '"' + (d.inDrive ? ' checked' : '') + dis() + '> Anexado</label></div>';
+      }).join('') + '</div></div></div>';
+    $('p-drive').innerHTML = h;
+  }
+
+  function renderRel() {
+    var a = engAgg(), t = today(), open = allPend().filter(function (r) { return !r.done; }).sort(function (x, y) { return x.due < y.due ? -1 : 1; }), logo = document.querySelector('.ide-official-logo');
+    var counts = STATUS.map(function (_, i) { return POSTS.filter(function (p) { return st(p.id) === i; }).length; });
+    var h = '<div class="col"><div class="panel"><div class="report-head"><div style="display:flex;gap:14px;align-items:center"><img class="rep-logo" alt="Ide+" src="' + (logo ? esc(logo.getAttribute('src')) : '') + '"><div><h2>Relatório do ' + esc(CYCLE.name) + '</h2><p class="none">' + dm(CYCLE.start) + ' a ' + dm(CYCLE.end) + ' · gerado em ' + dm(iso(t)) + '/' + t.getFullYear() + ' às ' + String(new Date().getHours()).padStart(2, '0') + ':' + String(new Date().getMinutes()).padStart(2, '0') + '</p></div></div>' +
+      '<div class="noprint"><button class="btn primary" data-act="print">Imprimir ou salvar em PDF</button></div></div><p class="none noprint">Se a janela de impressão não abrir (alguns navegadores embutidos bloqueiam), use Ctrl+P ou Cmd+P.</p></div>' +
+      '<div class="kpis">' + STATUS.map(function (n, i) { return '<div class="kpi"><b>' + counts[i] + '</b><span>' + n + '</span></div>'; }).join('') + '</div>' + attentionCard(false) +
+      '<div class="panel"><h2>Pendências abertas</h2>' + (open.length ? '<div class="scroll"><table><thead><tr><th>Post</th><th>Pendência</th><th>Responsável</th><th>Prazo</th></tr></thead><tbody>' + open.map(function (r) { return '<tr><td class="tnum">' + dm(r.p.date) + '</td><td>' + esc(r.t) + '</td><td>' + (esc(r.owner) || '-') + '</td><td class="tnum">' + dm(r.due) + (r.due < iso(t) ? ' <span class="pill bad">atrasada</span>' : '') + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<p class="none">Nenhuma pendência aberta.</p>') + '</div>' +
+      '<div class="panel"><h2>Posts do ciclo</h2><div class="scroll"><table><thead><tr><th>Data</th><th>Post</th><th>Formato</th><th>Responsável</th><th>Status</th></tr></thead><tbody>' + POSTS.map(function (p) { var d = doc(p.id); return '<tr><td class="tnum">' + dm(p.date) + (d.time ? ' ' + esc(d.time) : '') + '</td><td>' + esc(p.title) + '</td><td>' + esc(p.format) + '</td><td>' + (esc(d.owner) || '-') + '</td><td><span class="pill" data-s="' + st(p.id) + '">' + STATUS[st(p.id)] + '</span></td></tr>'; }).join('') + '</tbody></table></div></div>' +
+      '<div class="panel"><h2>Metas e resultados</h2>' + CYCLE.goals.map(function (g) {
+        var gd = (META.goals || {})[g.key] || {}, res = g.auto === 'views' ? a.tv : g.auto === 'rate' ? (a.tv ? a.ti / a.tv * 100 : 0) : gd.res;
+        return '<div class="bar"><span>' + esc(g.label) + '</span><span class="tnum">Meta: ' + (gd.meta != null ? fmt(gd.meta) : 'a definir') + '</span><b class="tnum">' + (res != null ? (g.auto === 'rate' ? res.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%' : fmt(res)) : '-') + '</b></div>';
+      }).join('') + '</div></div>';
+    $('p-relatorio').innerHTML = h;
+  }
+
+
+  function loadTeam() {
+    sb.from('perfis').select('id,nome,email,papel').order('nome').then(function (r) {
+      if (r.error) { note('Não foi possível carregar a equipe.', true); team = []; } else team = r.data || [];
+      if (view === 'equipe') render();
+    }, function () { team = []; note('Sem conexão.', true); });
+  }
+  function renderEquipe() {
+    var el = $('p-equipe');
+    if (!remote) { el.innerHTML = '<div class="empty">A gestão da equipe só existe quando o login (Supabase) está ativo.</div>'; return; }
+    if (team === null) { el.innerHTML = '<div class="empty">Carregando…</div>'; loadTeam(); return; }
+    var me = perfil && perfil.id;
+    el.innerHTML = '<div class="col"><div class="panel"><h2>Equipe e permissões</h2>' +
+      '<p class="none"><b>Editor</b> vê e altera todo o painel. <b>Consultor</b> vê só o resumo mensal. Quem é convidado entra como consultor e você promove aqui.</p>' +
+      '<div class="scroll"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Permissão</th></tr></thead><tbody>' +
+      team.map(function (u) {
+        var self = u.id === me;
+        return '<tr><td>' + esc(u.nome || '-') + (self ? ' <span class="none">(você)</span>' : '') + '</td><td>' + esc(u.email || '-') + '</td><td><select class="plain" style="width:auto" data-act="team-papel" data-id="' + esc(u.id) + '"' + (self ? ' disabled' : '') + '>' +
+          '<option value="consultor"' + (u.papel === 'consultor' ? ' selected' : '') + '>Consultor</option><option value="editor"' + (u.papel === 'editor' ? ' selected' : '') + '>Editor</option></select></td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<div class="warnbox">Para convidar alguém novo: no Supabase, vá em Authentication > Users > Invite user. A pessoa recebe o e-mail, cria a senha em login.html e aparece aqui como consultor.</div>' +
+      '<div class="linkbox"><button class="btn" data-act="team-reload">Atualizar lista</button></div></div></div>';
+  }
+
+  /* ---------- Renderização com foco preservado ---------- */
+  function focusKey() {
+    var el = document.activeElement; if (!el || el === document.body) return null;
+    var k = { id: el.id || '', act: el.getAttribute('data-act'), did: el.getAttribute('data-id'), i: el.getAttribute('data-i'), kk: el.getAttribute('data-k'), n: el.getAttribute('data-n'), v: el.getAttribute('data-v') };
+    try { k.s = el.selectionStart; k.e = el.selectionEnd; } catch (e) {}
+    return k;
+  }
+  function restoreFocus(k) {
+    if (!k) return; var sel;
+    if (k.id) sel = '#' + k.id; else if (k.act) { sel = '[data-act="' + k.act + '"]'; ['did:data-id', 'i:data-i', 'kk:data-k', 'n:data-n', 'v:data-v'].forEach(function (z) { var p = z.split(':'); if (k[p[0]] != null) sel += '[' + p[1] + '="' + k[p[0]] + '"]'; }); } else return;
+    var el = document.querySelector(sel); if (!el) return;
+    try { el.focus({ preventScroll: true }); if (k.s != null && el.setSelectionRange && /^(text|url|search)$/.test(el.type || '')) el.setSelectionRange(k.s, k.e); } catch (e) {}
+  }
+  function render() {
+    var fk = focusKey(), tabs = $('tabs');
+    if (!tabs.children.length) tabs.innerHTML = TABS.map(function (t) { return '<button class="tab" role="tab" id="t-' + t[0] + '" aria-controls="p-' + t[0] + '" data-act="tab" data-v="' + t[0] + '">' + t[1] + '<span class="badge" id="b-' + t[0] + '" hidden></span></button>'; }).join('');
+    TABS.forEach(function (t) { var on = t[0] === view; $('p-' + t[0]).hidden = !on; var b = $('t-' + t[0]); b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
+    var op = openPendTotal(), bd = $('b-pendencias'); bd.textContent = op; bd.hidden = !op;
+    ({ hoje: renderHoje, quadro: renderQuadro, stories: renderStories, pendencias: renderPend, programacao: renderProg, engajamento: renderEng, drive: renderDrive, relatorio: renderRel, equipe: renderEquipe })[view]();
+    restoreFocus(fk); setBackupStatus();
+  }
+  var rt = null, dirty = false, pointerDown = false;
+  function typing() { var a = document.activeElement; return !!a && /^(INPUT|TEXTAREA)$/.test(a.tagName) && !/^(checkbox|radio|button|file)$/.test(a.type); }
+  function queueRender() {
+    dirty = true; clearTimeout(rt);
+    rt = setTimeout(function () { if (pointerDown || typing()) return; dirty = false; render(); }, 450);
+  }
+
+  /* ---------- Ações ---------- */
+  function setPostStatus(id, v) { savePost(id, { status: v, approvedAt: v >= 3 ? (doc(id).approvedAt || iso(today())) : null }); }
+  function setStoryStatus(id, v) { saveStory(id, { status: v, approved: v >= 3, published: v === 4 }); }
+  function setStoryCheck(id, k, val) {
+    var s = sst(id), p = {}; p[k] = val;
+    if (k === 'approved') { if (val && s < 3) p.status = 3; if (!val && s >= 3) { p.status = 2; p.published = false; } }
+    if (k === 'published') { if (val) { p.status = 4; p.approved = true; } else if (s === 4) p.status = 3; }
+    saveStory(id, p);
+  }
+  function parsePaste(text) {
+    var ok = 0, bad = [], map = { ig: 'ig', instagram: 'ig', fb: 'fb', facebook: 'fb', tt: 'tt', tiktok: 'tt' };
+    text.split(/\r?\n/).forEach(function (line) {
+      line = line.trim(); if (!line) return;
+      var c = line.split(/\t|;/).map(function (x) { return x.trim(); });
+      var m = /^(\d{1,2})\/(\d{1,2})/.exec(c[0] || ''), net = map[(c[1] || '').toLowerCase()];
+      var p = m && POSTS.filter(function (x) { return dm(x.date) === String(m[1]).padStart(2, '0') + '/' + String(m[2]).padStart(2, '0'); })[0];
+      var num = function (x) { return x == null || x === '' ? null : Number(String(x).replace(/\./g, '').replace(',', '.')); };
+      var v = num(c[2]), i = num(c[3]), k = num(c[4]);
+      if (!p || !net || p.nets.indexOf(net) < 0 || v == null || !isFinite(v) || (i != null && !isFinite(i))) { bad.push(line); return; }
+      var patch = { m: {} }; patch.m[net] = { views: v, inter: i == null ? null : i, clicks: k == null || !isFinite(k) ? null : k };
+      savePost(p.id, patch); ok++;
+    });
+    return { ok: ok, bad: bad };
+  }
+  function backupPayload() { return { version: 2, app: 'ideplus-painel-marketing', cycle: CYCLE.id, posts: S, stories: SS, meta: META, updatedAt: new Date().toISOString() }; }
+  function markBackup() { try { localStorage.setItem(LB_KEY, new Date().toISOString()); } catch (e) {} setBackupStatus(); }
+  function exportFile() {
+    try {
+      var blob = new Blob([JSON.stringify(backupPayload(), null, 2)], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = 'ideplus-backup-' + iso(today()) + '.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      markBackup(); note('Backup gerado. Se o arquivo não aparecer na pasta de downloads, use "Copiar backup".');
+    } catch (e) { note('Não foi possível baixar. Use "Copiar backup".', true); }
+  }
+  function copyBackup() {
+    var txt = JSON.stringify(backupPayload()), ta = $('backup-paste');
+    var fallback = function () { ta.value = txt; ta.focus(); ta.select(); note('Selecione e copie o texto da caixa abaixo (Ctrl+C) e guarde em um documento.'); markBackup(); };
+    try { navigator.clipboard.writeText(txt).then(function () { markBackup(); note('Backup copiado. Cole em um documento ou e-mail para guardar.'); }, fallback); } catch (e) { fallback(); }
+  }
+  function stageImport(text) {
+    try {
+      var d = JSON.parse(text);
+      if (!d || d.app !== 'ideplus-painel-marketing' || (d.version !== 1 && d.version !== 2) || !d.posts || typeof d.posts !== 'object' || Array.isArray(d.posts)) throw Error('formato');
+      pendingImport = { posts: d.posts, stories: d.stories && typeof d.stories === 'object' ? d.stories : {}, meta: normMeta(d.version === 1 ? { drive: d.drive } : d.meta), at: d.updatedAt };
+      var c = $('import-confirm'); c.hidden = false;
+      c.innerHTML = '<div class="warnbox">Backup de ' + (d.updatedAt ? new Date(d.updatedAt).toLocaleString('pt-BR') : 'data desconhecida') + ' com dados de ' + plural(Object.keys(d.posts).length, 'post', 'posts') + ' e ' + plural(Object.keys(pendingImport.stories).length, 'dia de stories', 'dias de stories') + '. Os dados atuais serão substituídos.</div>' +
+        '<div class="linkbox" style="margin-top:8px"><button class="btn primary" data-act="import-yes">Substituir dados</button><button class="btn" data-act="import-no">Cancelar</button></div>';
+    } catch (e) { note('Arquivo ou texto inválido. Use um backup gerado por este painel.', true); }
+  }
+  function applyImport() {
+    if (!pendingImport || !canWrite) return;
+    S = pendingImport.posts; SS = pendingImport.stories; META = pendingImport.meta; pendingImport = null; $('import-confirm').hidden = true; $('backup-paste').value = '';
+    if (db || remote) { Object.keys(S).forEach(function (k) { persist('p', k); }); Object.keys(SS).forEach(function (k) { persist('s', k); }); persist('m'); } else localSave();
+    note('Backup aplicado.'); render();
+  }
+
+  /* ---------- Eventos ---------- */
+  function openPost(id) { view = 'quadro'; openId = id; fWeek = 0; fStatus = -1; render(); var e = $('post-' + id); if (e) e.scrollIntoView({ block: 'center' }); }
+  function openStory(id) { view = 'stories'; storyOpen = id; storyWeek = 0; render(); var e = $('story-' + id); if (e) e.scrollIntoView({ block: 'center' }); }
+  document.addEventListener('pointerdown', function () { pointerDown = true; });
+  document.addEventListener('pointerup', function () { pointerDown = false; if (dirty) queueRender(); });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act],a[data-act]'); if (!b) return;
+    var act = b.getAttribute('data-act'), id = b.getAttribute('data-id');
+    switch (act) {
+      case 'tab': view = b.getAttribute('data-v'); try { location.hash = view; } catch (x) {} render(); window.scrollTo(0, 0); break;
+      case 'toggle': openId = openId === id ? null : id; render(); break;
+      case 'open-post': openPost(id); break;
+      case 'open-story': openStory(id); break;
+      case 'fweek': fWeek = +b.getAttribute('data-i'); render(); break;
+      case 'fstatus': var i = +b.getAttribute('data-i'); fStatus = fStatus === i ? -1 : i; render(); break;
+      case 'story-week': storyWeek = +b.getAttribute('data-i'); render(); break;
+      case 'story-toggle': storyOpen = storyOpen === id ? null : id; render(); break;
+      case 'pfilter': pFilter = b.getAttribute('data-v'); render(); break;
+      case 'edit': editId = editId === id ? null : id; render(); break;
+      case 'drive-save':
+        var v = $('drive-url').value.trim();
+        if (v && !/^https:\/\//.test(v)) { note('O link precisa começar com https://', true); return; }
+        note(''); saveMeta({ drive: { url: v } }); render(); break;
+      case 'copy':
+        try { navigator.clipboard.writeText(META.drive.url).then(function () { b.textContent = 'Link copiado'; }, function () { note('Não foi possível copiar. Selecione o endereço e copie manualmente.', true); }); } catch (x) { note('Não foi possível copiar. Selecione o endereço e copie manualmente.', true); } break;
+      case 'paste-apply':
+        var r = parsePaste($('paste-metrics').value); pasteText = r.bad.join('\n'); render();
+        $('paste-result').textContent = r.ok + ' linha(s) aplicada(s).' + (r.bad.length ? ' ' + r.bad.length + ' linha(s) não reconhecida(s) ficaram na caixa para você corrigir.' : ''); break;
+      case 'print': try { window.print(); } catch (x) { note('Não foi possível abrir a impressão. Use Ctrl+P.', true); } break;
+      case 'logout': sb.auth.signOut().then(goLogin, goLogin); break;
+      case 'team-reload': team = null; render(); break;
+      case 'export': exportFile(); break;
+      case 'copy-backup': copyBackup(); break;
+      case 'import': $('backup-file').click(); break;
+      case 'import-paste': stageImport($('backup-paste').value); break;
+      case 'import-yes': applyImport(); break;
+      case 'import-no': pendingImport = null; $('import-confirm').hidden = true; break;
+    }
+  });
+  function handle(t) {
+    var act = t.getAttribute('data-act'), id = t.getAttribute('data-id'), i = t.getAttribute('data-i'), k = t.getAttribute('data-k'); if (!act) return;
+    var val = t.type === 'checkbox' ? t.checked : t.value, o;
+    switch (act) {
+      case 'status': setPostStatus(id, +val); render(); break;
+      case 'pend': o = {}; o[i] = val; savePost(id, { pend: o }); render(); break;
+      case 'pend-owner': o = {}; o[i] = String(val).trim() || null; savePost(id, { po: o }); queueRender(); break;
+      case 'pend-due': o = {}; o[i] = val || null; savePost(id, { pdue: o }); queueRender(); break;
+      case 'p-owner': savePost(id, { owner: String(val).trim() || null }); queueRender(); break;
+      case 'p-time': savePost(id, { time: val || null }); queueRender(); break;
+      case 'p-appby': savePost(id, { approvedBy: String(val).trim() || null }); break;
+      case 'p-note': savePost(id, { note: String(val).trim() || null }); break;
+      case 'indrive': savePost(id, { inDrive: !!val }); render(); break;
+      case 'plink': if (val && !/^https:\/\//.test(val.trim())) { note('O link precisa começar com https://', true); return; } note(''); savePost(id, { link: val.trim() || null }); break;
+      case 'metric': o = { m: {} }; o.m[t.getAttribute('data-n')] = {}; o.m[t.getAttribute('data-n')][k] = numOrNull(val); savePost(id, o); softEng(); queueRender(); break;
+      case 'goal-meta': o = { goals: {} }; o.goals[k] = { meta: numOrNull(val) }; saveMeta(o); softEng(); break;
+      case 'goal-res': o = { goals: {} }; o.goals[k] = { res: numOrNull(val) }; saveMeta(o); softEng(); break;
+      case 'story-status': setStoryStatus(id, +val); render(); break;
+      case 'story-check': setStoryCheck(id, k, !!val); render(); break;
+      case 'story-metric': o = {}; o[k] = numOrNull(val); saveStory(id, o); setText('ret-' + id, retention(sdoc(id))); break;
+      case 'story-note': saveStory(id, { note: String(val).trim() || null }); break;
+      case 'fb-date': saveMeta({ feedback: { date: val || '' } }); queueRender(); break;
+      case 'fb-check': o = { feedback: { checks: {} } }; o.feedback.checks[i] = !!val; saveMeta(o); render(); break;
+      case 'powner': pOwner = val; render(); break;
+      case 'paste-text': pasteText = val; break;
+      case 'team-papel': sb.from('perfis').update({ papel: val }).eq('id', id).then(function (r) {
+          if (r.error) { note('Não foi possível alterar a permissão.', true); loadTeam(); return; }
+          team.forEach(function (u) { if (u.id === id) u.papel = val; }); note('Permissão atualizada.'); render();
+        }); break;
+    }
+  }
+  document.addEventListener('change', function (e) { var t = e.target; if (t.id === 'backup-file') return; handle(t); });
+  var liveT = {};
+  document.addEventListener('input', function (e) {
+    var t = e.target; if (!t.getAttribute || !t.getAttribute('data-live')) return;
+    if (t.getAttribute('data-act') === 'paste-text') { pasteText = t.value; return; }
+    var key = (t.getAttribute('data-act') || '') + (t.getAttribute('data-id') || '') + (t.getAttribute('data-n') || '') + (t.getAttribute('data-k') || '');
+    clearTimeout(liveT[key]); liveT[key] = setTimeout(function () { handle(t); }, 400);
+  });
+  document.addEventListener('focusout', function () { setTimeout(function () { if (dirty && !pointerDown && !typing()) queueRender(); }, 0); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.id === 'drive-url') { e.preventDefault(); document.querySelector('[data-act="drive-save"]').click(); return; }
+    var tb = e.target.closest && e.target.closest('[role="tab"]');
+    if (tb && (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'Home' || e.key === 'End')) {
+      var idx = TABS.map(function (t) { return t[0]; }).indexOf(view), n = TABS.length;
+      idx = e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : (idx + (e.key === 'ArrowRight' ? 1 : -1) + n) % n;
+      view = TABS[idx][0]; render(); $('t-' + view).focus(); e.preventDefault();
+    }
+  });
+  $('backup-file').addEventListener('change', function (e) {
+    var f = e.target.files[0]; if (!f) return; var r = new FileReader();
+    r.onload = function () { stageImport(String(r.result)); }; r.onerror = function () { note('Não foi possível ler o arquivo de backup.', true); }; r.readAsText(f); e.target.value = '';
+  });
+
+  /* ---------- Início ---------- */
+  $('subtitle').textContent = CYCLE.name + ' · ' + dm(CYCLE.start) + ' a ' + dm(CYCLE.end) + '/' + pd(CYCLE.end).getFullYear() + ' · 3 posts por semana · TikTok, Instagram e Facebook · stories diários';
+  var h0 = (location.hash || '').replace('#', ''); if (TABS.some(function (t) { return t[0] === h0; })) view = h0;
+  var CFG = window.IDE_CFG || {}, useRemote = /^https:\/\//.test(CFG.url || '') && CFG.key && CFG.key.indexOf('COLE_AQUI') < 0;
+  if (!useRemote) loadLocal();
+  render();
+
+  /* Modo compartilhado: só liga quando a página é publicada com o recurso de banco de dados */
+  /* ---------- Modo com login (Supabase): a tela de login é a página login.html ---------- */
+  function goLogin() { location.replace('login.html'); }
+  function applyRow(r) {
+    var k = r.chave, d = r.dados; if (!k || !d || typeof d !== 'object') return;
+    if (k === 'meta') META = normMeta(d); else if (k.indexOf('post:') === 0) S[k.slice(5)] = d; else if (k.indexOf('story:') === 0) SS[k.slice(6)] = d;
+  }
+  function enter(session) {
+    Promise.all([sb.from('perfis').select('nome,papel,email').eq('id', session.user.id).maybeSingle(), sb.from('painel').select('chave,dados')]).then(function (r) {
+      perfil = r[0].data || { nome: session.user.email, papel: 'leitor' }; perfil.id = session.user.id;
+      if (perfil.papel !== 'editor') { location.replace('resumo.html'); return; }
+      if (r[1].error) { note('Não foi possível carregar os dados. Entre de novo.', true); setTimeout(goLogin, 2000); return; }
+      S = {}; SS = {}; META = normMeta(null); (r[1].data || []).forEach(applyRow);
+      remote = {}; canWrite = true;
+      document.body.classList.remove('locked');
+      var ub = $('userbox'); ub.hidden = false;
+      ub.innerHTML = '<span>' + esc(perfil.nome || perfil.email || session.user.email) + '</span><span class="pill good">Editor</span><button class="btn" data-act="logout">Sair</button>';
+      render();
+      sb.channel('painel-live').on('postgres_changes', { event: '*', schema: 'public', table: 'painel' }, function (q) { if (q.new && q.new.chave) { applyRow(q.new); queueRender(); } }).subscribe();
+    }, function () { note('Sem conexão. Tente de novo.', true); });
+  }
+  function startRemote() {
+    document.body.classList.add('locked');
+    function init() {
+      sb = window.supabase.createClient(CFG.url, CFG.key);
+      sb.auth.onAuthStateChange(function (ev) { if (ev === 'SIGNED_OUT') goLogin(); });
+      sb.auth.getSession().then(function (r) { if (r.data && r.data.session) enter(r.data.session); else goLogin(); });
+    }
+    if (window.supabase) init(); else { var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js'; s.onload = init; s.onerror = function () { note('Não foi possível carregar o login. Verifique a conexão.', true); }; document.head.appendChild(s); }
+  }
+  if (useRemote) { startRemote(); return; }
+
+  var cl = window.claude;
+  if (cl && cl.use) {
+    Promise.all([cl.use('db').catch(function () { return null; }), cl.use('user').catch(function () { return null; })]).then(function (r) {
+      if (!r[0]) return; db = r[0];
+      var u = r[1]; if (u && u.can) Promise.resolve(u.can('data.write')).then(function (v) { if (v === false) { canWrite = false; render(); } });
+      db.collection('posts').onSnapshot(function (s) { S = {}; s.docs.forEach(function (d) { if (d.exists) S[d.id] = clone(d.data()); }); render(); }, function () { note('Não foi possível carregar os dados compartilhados.', true); });
+      db.collection('stories').onSnapshot(function (s) { SS = {}; s.docs.forEach(function (d) { if (d.exists) SS[d.id] = clone(d.data()); }); render(); }, function () {});
+      db.doc('config/main').onSnapshot(function (d) { META = normMeta(d.exists ? clone(d.data()) : null); render(); }, function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>

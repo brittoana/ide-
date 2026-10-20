@@ -1,0 +1,2 @@
+/* Configuração única do Supabase. Preencha aqui e vale para login.html, painel.html e resumo.html. */
+window.IDE_CFG = { url: "https://cmbijiltmlfuskdymdbm.supabase.co/rest/v1/", key: "sb_publishable_O3CsvcasN-05U3CfLmS-wg_B7_VMMDK" };
