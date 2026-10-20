@@ -120,7 +120,7 @@ input:focus { border-color: var(--accent); }
   function go(session) {
     msg('Entrando…');
     sb.from('perfis').select('papel').eq('id', session.user.id).maybeSingle().then(function (r) {
-      if (r.error) { msg('Não foi possível verificar seu perfil. Tente de novo.', true); return; }
+      if (r.error) { msg('Falha ao verificar perfil: ' + r.error.message, true); return; }
       location.replace(r.data && r.data.papel === 'editor' ? 'painel.html' : 'resumo.html');
     }, function () { msg('Sem conexão. Tente de novo.', true); });
   }
@@ -136,7 +136,7 @@ input:focus { border-color: var(--accent); }
     $('login-form').addEventListener('submit', function (e) {
       e.preventDefault(); msg('Entrando…');
       sb.auth.signInWithPassword({ email: $('lg-email').value.trim(), password: $('lg-pass').value }).then(function (r) {
-        if (r.error) msg('E-mail ou senha incorretos.', true); else { $('lg-pass').value = ''; go(r.data.session); }
+        if (r.error) msg(r.error.message === 'Email not confirmed' ? 'Confirme o e-mail antes de entrar.' : 'Não foi possível entrar: ' + r.error.message, true); else { $('lg-pass').value = ''; go(r.data.session); }
       }, function () { msg('Sem conexão. Tente de novo.', true); });
     });
     $('forgot').addEventListener('click', function () {

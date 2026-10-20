@@ -358,6 +358,8 @@ body.locked .tabs, body.locked main, body.locked details.tools { display: none; 
   }
   function enter(session) {
     Promise.all([sb.from('perfis').select('nome,papel,email').eq('id', session.user.id).maybeSingle(), sb.from('painel').select('chave,dados')]).then(function (r) {
+      if (r[0].error) { note('Erro na leitura do perfil: ' + r[0].error.message, true); return; }
+      if (!r[0].data) { note('Sua conta existe, mas não há perfil cadastrado. Execute o SQL de configuração de perfil.', true); return; }
       if (r[1].error) { note('Não foi possível carregar os dados. Entre de novo.', true); setTimeout(goLogin, 2000); return; }
       var perfil = r[0].data || { nome: session.user.email, papel: 'leitor' }, ed = perfil.papel === 'editor';
       S = {}; SS = {}; (r[1].data || []).forEach(applyRow);

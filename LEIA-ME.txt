@@ -1,0 +1,14 @@
+Ide+ | Versão corrigida
+
+Correções:
+- config.js usa a URL raiz do Supabase, sem /rest/v1/;
+- painel.html é o nome que o login espera;
+- mensagens de erro de autenticação/perfil mais específicas;
+- index.html encaminha para login.html.
+
+Publicação: envie todos os arquivos desta pasta juntos, na mesma pasta/raiz do seu site (login.html, painel.html, resumo.html, config.js, index.html).
+No Supabase, confirme em Authentication > Users que a conta existe, depois execute CONFIGURAR_PERFIL.sql no SQL Editor.
+Verifique em Authentication > URL Configuration a Site URL e Redirect URLs do site publicado, especialmente login.html para recuperação de senha/convite.
+O painel só sincroniza após autenticação e permissões RLS existentes no seu projeto.
+Não teste arquivos abrindo pelo protocolo file://; publique em HTTPS ou rode servidor local HTTP.
+Não compartilhe service_role/secret keys em arquivos públicos.
