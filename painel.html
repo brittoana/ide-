@@ -1036,7 +1036,6 @@ body.locked .tabs, body.locked main, body.locked details.tools { display: none; 
     }, function () { note('Sem conexão. Tente de novo.', true); });
   }
   function startRemote() {
-    document.body.classList.add('locked');
     function init() {
       sb = window.supabase.createClient(CFG.url, CFG.key);
       sb.auth.onAuthStateChange(function (ev) { if (ev === 'SIGNED_OUT') goLogin(); });
